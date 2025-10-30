@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mixcloud Upload Tool</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 1rem; background: #fafafa; }
+  h1 { font-size: 1.6rem; margin-bottom: 1rem; }
+  label { display: block; margin-top: 1rem; font-weight: bold; }
+  input, button, datalist { font-size: 1rem; padding: 0.5rem; width: 100%; box-sizing: border-box; margin-top: 0.3rem; }
+  button { width: auto; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 1.5rem; }
+  button:hover { background: #005ea6; }
+  #tag-container { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
+  .tag-chip { display: inline-flex; align-items: center; background: #0078d4; color: white; padding: 0.2rem 0.6rem; border-radius: 999px; cursor: pointer; font-size: 0.9rem; }
+  .tag-chip span { margin-left: 0.4rem; font-weight: bold; color: #eee; }
+  .tag-chip:hover { opacity: 0.8; transform: scale(1.05); transition: 0.1s; }
+  .success { color: green; margin-top: 1rem; }
+  .error { color: red; margin-top: 1rem; }
+  .tag-suggestions { border: 1px solid #ccc; background: white; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 1rem); z-index: 1000; }
+  .tag-suggestions div { padding: 0.4rem; cursor: pointer; }
+  .tag-suggestions div:hover { background: #0078d4; color: white; }
+</style>
+</head>
+<body>
+<h1>Mixcloud Upload Tool</h1>
+
+<form id="upload-form">
+  <label>MP3 File</label>
+  <input type="file" id="file" name="file" accept=".mp3" required />
+
+  <label>Show Title</label>
+  <input type="text" id="title" name="title" required />
+
+  <label>Host</label>
+  <input type="text" id="host" name="host" />
+
+  <label>Date</label>
+  <div style="display:flex; gap:0.5rem;">
+    <input type="number" id="day" name="day" placeholder="DD" min="1" max="31" style="width:80px;">
+    <input type="number" id="month" name="month" placeholder="MM" min="1" max="12" style="width:80px;">
+    <input type="number" id="year" name="year" placeholder="YY" min="20" max="30" style="width:80px;">
+  </div>
+
+  <label>Tags</label>
+  <div style="position:relative;">
+    <input type="text" id="tag-input" placeholder="Type tag and press Enter" autocomplete="off" />
+    <div id="tag-suggestions" class="tag-suggestions" style="display:none;"></div>
+  </div>
+  <div id="tag-container"></div>
+
+  <button type="submit">Upload to Mixcloud</button>
+  <div id="status"></div>
+</form>
+
+<script>
+const backendURL = "http://127.0.0.1:8000";
+const fileInput = document.getElementById("file");
+const titleInput = document.getElementById("title");
+const hostInput = document.getElementById("host");
+const tagInput = document.getElementById("tag-input");
+const tagContainer = document.getElementById("tag-container");
+const tagSuggestionsDiv = document.getElementById("tag-suggestions");
+const form = document.getElementById("upload-form");
+const statusDiv = document.getElementById("status");
+
+let currentTags = [];
+let showsMetadata = {};
+let allTags = new Set();
+
+// Load show metadata
+fetch(`${backendURL}/shows_metadata`)
+  .then(res => res.json())
+  .then(data => {
+    showsMetadata = data;
+    Object.values(data).forEach(show => (show.tags || []).forEach(tag => allTags.add(tag)));
+  });
+
+// Handle file input
+fileInput.addEventListener("change", () => {
+  const file = fileInput.files[0];
+  if (!file) return;
+
+  const filename = file.name.replace(".mp3", "");
+  const dateMatch = filename.match(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/);
+
+  if (dateMatch) {
+    document.getElementById("day").value = dateMatch[1].padStart(2,"0");
+    document.getElementById("month").value = dateMatch[2].padStart(2,"0");
+    document.getElementById("year").value = dateMatch[3];
+  }
+
+  const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim();
+  titleInput.value = cleanTitle;
+
+  const possibleShow = Object.keys(showsMetadata).find(show => cleanTitle.toLowerCase().includes(show.toLowerCase()));
+  if (possibleShow) {
+    const meta = showsMetadata[possibleShow];
+    hostInput.value = meta.host || "";
+    currentTags = [...(meta.tags || [])];
+    renderTags();
+  }
+});
+
+// Tag input
+tagInput.addEventListener("keydown", e => {
+  if (e.key === "Enter") {
+    e.preventDefault();
+    const tag = tagInput.value.trim();
+    if (tag && !currentTags.includes(tag)) {
+      currentTags.push(tag);
+      renderTags();
+      tagInput.value = "";
+      hideSuggestions();
+    }
+  }
+});
+
+tagInput.addEventListener("input", () => {
+  const value = tagInput.value.trim().toLowerCase();
+  if (!value) return hideSuggestions();
+  const matches = Array.from(allTags).filter(tag => tag.toLowerCase().includes(value) && !currentTags.includes(tag));
+  showSuggestions(matches);
+});
+
+function showSuggestions(matches) {
+  tagSuggestionsDiv.innerHTML = "";
+  if (matches.length === 0) {
+    tagSuggestionsDiv.style.display = "none";
+    return;
+  }
+  matches.forEach(tag => {
+    const div = document.createElement("div");
+    div.textContent = tag;
+    div.onclick = () => {
+      currentTags.push(tag);
+      renderTags();
+      tagInput.value = "";
+      hideSuggestions();
+    };
+    tagSuggestionsDiv.appendChild(div);
+  });
+  tagSuggestionsDiv.style.display = "block";
+}
+
+function hideSuggestions() { tagSuggestionsDiv.style.display = "none"; }
+
+function renderTags() {
+  tagContainer.innerHTML = "";
+  currentTags.forEach(tag => {
+    const chip = document.createElement("div");
+    chip.className = "tag-chip";
+    chip.title = "Click to remove";
+    chip.innerHTML = `${tag} <span>&times;</span>`;
+    chip.onclick = () => {
+      currentTags = currentTags.filter(t => t !== tag);
+      renderTags();
+    };
+    tagContainer.appendChild(chip);
+  });
+}
+
+// Submit form
+form.addEventListener("submit", async e => {
+  e.preventDefault();
+  statusDiv.textContent = "Uploading...";
+  statusDiv.className = "";
+
+  const formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+  formData.append("title", titleInput.value.trim());
+  formData.append("host", hostInput.value.trim());
+  formData.append("tags", currentTags.join(","));
+  formData.append("day", document.getElementById("day").value);
+  formData.append("month", document.getElementById("month").value);
+  formData.append("year", document.getElementById("year").value);
+
+  try {
+    const res = await fetch(`${backendURL}/upload`, { method: "POST", body: formData });
+    const result = await res.json();
+    if (result.success) {
+      statusDiv.textContent = "✅ Upload successful!";
+      statusDiv.className = "success";
+    } else {
+      statusDiv.textContent = "❌ Upload failed. Check logs.";
+      statusDiv.className = "error";
+    }
+  } catch (err) {
+    console.error(err);
+    statusDiv.textContent = "⚠️ Error during upload.";
+    statusDiv.className = "error";
+  }
+});
+
+document.addEventListener("click", e => {
+  if (!tagSuggestionsDiv.contains(e.target) && e.target !== tagInput) hideSuggestions();
+});
+</script>
+</body>
+</html>
