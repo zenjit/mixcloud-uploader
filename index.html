@@ -81,18 +81,30 @@ fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) return;
 
+  // --- Clear all fields first ---
+  titleInput.value = "";
+  hostInput.value = "";
+  document.getElementById("day").value = "";
+  document.getElementById("month").value = "";
+  document.getElementById("year").value = "";
+  currentTags = [];
+  renderTags();
+
   const filename = file.name.replace(".mp3", "");
   const dateMatch = filename.match(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/);
 
+  // Auto-fill date boxes if filename contains a date
   if (dateMatch) {
     document.getElementById("day").value = dateMatch[1].padStart(2,"0");
     document.getElementById("month").value = dateMatch[2].padStart(2,"0");
     document.getElementById("year").value = dateMatch[3];
   }
 
+  // Remove date from title
   const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim();
   titleInput.value = cleanTitle;
 
+  // Match title with CSV metadata
   const possibleShow = Object.keys(showsMetadata).find(show => cleanTitle.toLowerCase().includes(show.toLowerCase()));
   if (possibleShow) {
     const meta = showsMetadata[possibleShow];
