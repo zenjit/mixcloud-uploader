@@ -1,12 +1,16 @@
 import os
-import json
 import csv
 import logging
 import requests
-from pathlib import Path
 import webbrowser
+from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+
+from fastapi import FastAPI, UploadFile, Form
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse, JSONResponse
+import uvicorn
 
 # -----------------------
 # Logging setup
@@ -99,6 +103,7 @@ class MixcloudAuth:
         logging.info("OAuth flow completed successfully!")
         return access_token
 
+
 # -----------------------
 # Mixcloud Uploader
 # -----------------------
@@ -108,11 +113,6 @@ class MixcloudUploader:
         self.shows_folder = shows_folder
         self.metadata_file = metadata_file
         self.metadata = self.load_metadata()
-
-        # Overrides
-        self.upload_name_override = None
-        self.upload_description_override = None
-        self.upload_picture_override = None
 
     def load_metadata(self):
         metadata = {}
@@ -134,7 +134,7 @@ class MixcloudUploader:
         return metadata
 
     def find_best_match(self, name):
-        """Return best matching metadata entry for show_name (fuzzy)."""
+        """Loose match for show name from CSV"""
         from difflib import get_close_matches
         candidates = list(self.metadata.keys())
         matches = get_close_matches(name.lower(), [c.lower() for c in candidates], n=1, cutoff=0.6)
@@ -150,38 +150,31 @@ class MixcloudUploader:
         url = f"https://api.mixcloud.com/upload/?access_token={token}"
 
         files = {"mp3": open(mp3_path, "rb")}
-        if self.upload_picture_override and os.path.exists(self.upload_picture_override):
-            files["picture"] = open(self.upload_picture_override, "rb")
 
-        # Determine show name
-        show_name = title or self.upload_name_override or os.path.basename(mp3_path).replace(".mp3", "")
-
-        # Load metadata if available
+        show_name = title or os.path.basename(mp3_path).replace(".mp3", "")
         meta = self.find_best_match(show_name)
         bio = meta.get("bio", "").strip()
         csv_host = meta.get("host", "").strip()
         csv_tags = meta.get("tags", [])
 
-        # Combine CSV and frontend inputs
         final_host = host or csv_host
         final_tags = tags or csv_tags[:5]
 
-        # Build description: combine bio, host, date, tracklist
         description_parts = []
         if bio:
             description_parts.append(bio)
         if date_str:
-            description_parts.append(f"Tracklist: http://dublab.cat/shows/{show_name.lower().replace(' ', '-')}/{date_str}")
-
+            description_parts.append(
+                f"Tracklist: http://dublab.cat/shows/{show_name.lower().replace(' ', '-')}/{date_str}"
+            )
         description = "\n\n".join(description_parts) or "Uploaded via Mixcloud Uploader"
 
-        # Build request payload
-        show_name += " " + date_str + " w/ " + final_host
+        show_name = f"{show_name} {date_str} w/{final_host}"
         data = {"name": show_name, "description": description}
-        for i, tag in enumerate(final_tags[:5]):  # Mixcloud allows up to 5 tags
+        for i, tag in enumerate(final_tags[:5]):
             data[f"tags-{i}-tag"] = tag
 
-        logging.info(f"Uploading '{mp3_path}' as show '{show_name}' with tags {final_tags} and host '{final_host}' on '{date_str}'...")
+        logging.info(f"Uploading '{show_name}' with tags {final_tags} and host '{final_host}'")
 
         try:
             resp = requests.post(url, files=files, data=data)
@@ -193,7 +186,7 @@ class MixcloudUploader:
             logging.info("✅ Upload successful")
             return True
         elif resp.status_code in (401, 403):
-            logging.warning("🔑 Access token invalid or expired — clearing saved token.")
+            logging.warning("🔑 Access token invalid — deleting token file")
             try:
                 os.remove(self.auth.token_file)
             except OSError as e:
@@ -203,3 +196,73 @@ class MixcloudUploader:
         else:
             logging.error(f"❌ Upload failed: {resp.status_code} {resp.text}")
             return False
+
+
+# -----------------------
+# FastAPI App for Railway
+# -----------------------
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# serve frontend
+@app.get("/")
+def serve_frontend():
+    return FileResponse("index.html")
+
+@app.get("/shows_metadata")
+def shows_metadata():
+    uploader = MixcloudUploader(auth, ".", "shows.csv")
+    return uploader.metadata
+
+@app.post("/upload")
+async def upload_to_mixcloud(
+    file: UploadFile,
+    title: str = Form(...),
+    host: str = Form(""),
+    tags: str = Form(""),
+    day: str = Form(""),
+    month: str = Form(""),
+    year: str = Form(""),
+):
+    os.makedirs("uploads", exist_ok=True)
+    temp_path = Path("uploads") / file.filename
+    with open(temp_path, "wb") as f:
+        f.write(await file.read())
+
+    date_str = f"{day}-{month}-{year}".strip("-")
+    tag_list = [t.strip() for t in tags.split(",") if t.strip()]
+
+    uploader = MixcloudUploader(auth, ".", "shows.csv")
+    success = uploader.upload(str(temp_path), title, host, tag_list, date_str)
+
+    try:
+        os.remove(temp_path)
+    except Exception as e:
+        logging.warning(f"Could not delete temp file: {e}")
+
+    return JSONResponse({"success": success})
+
+
+# -----------------------
+# App startup
+# -----------------------
+if __name__ == "__main__":
+    auth = MixcloudAuth(
+        client_id=os.getenv("MIXCLOUD_CLIENT_ID"),
+        client_secret=os.getenv("MIXCLOUD_CLIENT_SECRET"),
+        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080"),
+    )
+
+    uvicorn.run("mixcloud_backend:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+else:
+    # For Railway runtime
+    auth = MixcloudAuth(
+        client_id=os.getenv("MIXCLOUD_CLIENT_ID"),
+        client_secret=os.getenv("MIXCLOUD_CLIENT_SECRET"),
+        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080"),
+    )
