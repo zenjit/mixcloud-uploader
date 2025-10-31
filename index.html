@@ -129,8 +129,8 @@ async function detectBackend(){
   try{
     let res = await fetch(`${window.location.origin}/shows_metadata`);
     if(res.ok) backendURL = window.location.origin;
-    else backendURL = "https://your-backend-railway-url.up.railway.app";
-  }catch(err){ backendURL = "https://your-backend-railway-url.up.railway.app"; }
+    else backendURL = "https://mixcloud-uploader-production.up.railway.app";
+  }catch(err){ backendURL = "https://mixcloud-uploader-production.up.railway.app"; }
 }
 await detectBackend();
 
