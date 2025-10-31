@@ -145,6 +145,18 @@ class MixcloudUploader:
                 return self.metadata[key]
         return {}
 
+    def find_image(self, show_name):
+        """Try to find an image file in ./images/ matching the show name"""
+        img_folder = Path("images")
+        if not img_folder.exists():
+            return None
+        base_name = show_name.lower().replace(" ", "_")
+        for ext in [".jpg", ".jpeg", ".png", ".webp"]:
+            candidate = img_folder / f"{base_name}{ext}"
+            if candidate.exists():
+                return str(candidate)
+        return None
+
     def upload(self, mp3_path, title=None, host=None, tags=None, date_str=None):
         token = self.auth.get_token()
         url = f"https://api.mixcloud.com/upload/?access_token={token}"
@@ -156,6 +168,7 @@ class MixcloudUploader:
         bio = meta.get("bio", "").strip()
         csv_host = meta.get("host", "").strip()
         csv_tags = meta.get("tags", [])
+        image_path = self.find_image(show_name)
 
         final_host = host or csv_host
         final_tags = tags or csv_tags[:5]
@@ -169,10 +182,20 @@ class MixcloudUploader:
             )
         description = "\n\n".join(description_parts) or "Uploaded via Mixcloud Uploader"
 
-        show_name = f"{show_name} {date_str} w/{final_host}"
+        show_name = f"{show_name} {date_str} w/ {final_host}"
         data = {"name": show_name, "description": description}
         for i, tag in enumerate(final_tags[:5]):
             data[f"tags-{i}-tag"] = tag
+
+        # Include image if found
+        if image_path:
+            try:
+                files["picture"] = open(image_path, "rb")
+                logging.info(f"✅ Using image {image_path}")
+            except Exception as e:
+                logging.warning(f"⚠️ Could not open image file '{image_path}': {e}")
+        else:
+            logging.info("🖼️ No image found for this show")
 
         logging.info(f"Uploading '{show_name}' with tags {final_tags} and host '{final_host}'")
 
@@ -209,7 +232,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# serve frontend
 @app.get("/")
 def serve_frontend():
     return FileResponse("index.html")
@@ -260,7 +282,6 @@ if __name__ == "__main__":
 
     uvicorn.run("mixcloud_backend:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
 else:
-    # For Railway runtime
     auth = MixcloudAuth(
         client_id=os.getenv("MIXCLOUD_CLIENT_ID"),
         client_secret=os.getenv("MIXCLOUD_CLIENT_SECRET"),
