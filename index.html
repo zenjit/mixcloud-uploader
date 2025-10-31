@@ -3,27 +3,68 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Mixcloud Upload Tool</title>
+<title>Dublab.cat Mixcloud Upload Tool</title>
 <style>
-  body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; padding: 1rem; background: #fafafa; }
-  h1 { font-size: 1.6rem; margin-bottom: 1rem; }
-  label { display: block; margin-top: 1rem; font-weight: bold; }
-  input, button, datalist { font-size: 1rem; padding: 0.5rem; width: 100%; box-sizing: border-box; margin-top: 0.3rem; }
-  button { width: auto; background: #0078d4; color: white; border: none; border-radius: 6px; cursor: pointer; margin-top: 1.5rem; }
-  button:hover { background: #005ea6; }
-  #tag-container { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
-  .tag-chip { display: inline-flex; align-items: center; background: #0078d4; color: white; padding: 0.2rem 0.6rem; border-radius: 999px; cursor: pointer; font-size: 0.9rem; }
-  .tag-chip span { margin-left: 0.4rem; font-weight: bold; color: #eee; }
-  .tag-chip:hover { opacity: 0.8; transform: scale(1.05); transition: 0.1s; }
-  .success { color: green; margin-top: 1rem; }
-  .error { color: red; margin-top: 1rem; }
-  .tag-suggestions { border: 1px solid #ccc; background: white; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 1rem); z-index: 1000; }
-  .tag-suggestions div { padding: 0.4rem; cursor: pointer; }
-  .tag-suggestions div:hover { background: #0078d4; color: white; }
+/* ---------- Psychedelic background ---------- */
+html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family: system-ui, sans-serif; }
+body {
+  background: linear-gradient(270deg, #ff3cac, #784ba0, #2b86c5, #ff9a3c, #f9ff3c);
+  background-size: 1500% 1500%;
+  animation: rainbowGradient 30s ease infinite;
+  display:flex; justify-content:center; align-items:center;
+}
+@keyframes rainbowGradient {
+  0% {background-position:0% 50%}
+  50% {background-position:100% 50%}
+  100% {background-position:0% 50%}
+}
+body::before {
+  content:"";
+  position:absolute; top:0; left:0; width:100%; height:100%;
+  background: radial-gradient(circle, rgba(255,255,255,0.05) 2px, transparent 2px);
+  background-size:50px 50px;
+  animation:ripple 12s linear infinite;
+  pointer-events:none; z-index:0;
+}
+@keyframes ripple {
+  0% {transform:translate(0,0) scale(1);}
+  50% {transform:translate(25px,25px) scale(1.03);}
+  100% {transform:translate(0,0) scale(1);}
+}
+
+/* Sparkle canvas */
+canvas#sparkleCanvas {position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;}
+
+/* ---------- Form styling ---------- */
+#form-container {
+  position:relative; z-index:1;
+  background: rgba(255,255,255,0.95);
+  padding: 2rem; border-radius:16px;
+  max-width:700px; width:90%;
+  box-shadow:0 0 30px rgba(0,0,0,0.3);
+}
+h1 { font-size:1.6rem; margin-bottom:1rem; text-align:center; color:#222; text-shadow:0 0 8px #fff,0 0 12px #ff3cac,0 0 20px #784ba0; }
+label { display:block; margin-top:1rem; font-weight:bold; color:#222; }
+input, button, datalist { font-size:1rem; padding:0.5rem; width:100%; box-sizing:border-box; margin-top:0.3rem; border-radius:6px; border:1px solid #ccc; }
+input:focus { outline:none; border-color:#ff3cac; box-shadow:0 0 12px #ff3cac66,0 0 20px #784ba099; }
+button { width:auto; background:linear-gradient(45deg,#ff3cac,#784ba0,#2b86c5); color:white; border:none; cursor:pointer; margin-top:1.5rem; transition: transform 0.2s; }
+button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#2b86c5,#ff9a3c); }
+
+#tag-container { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.5rem; }
+.tag-chip { display:inline-flex; align-items:center; background:#784ba0; color:white; padding:0.2rem 0.6rem; border-radius:999px; cursor:pointer; font-size:0.9rem; }
+.tag-chip span { margin-left:0.4rem; font-weight:bold; color:#eee; }
+.tag-chip:hover { opacity:0.8; transform:scale(1.05); transition:0.1s; }
+.success { color: green; margin-top:1rem; } .error { color:red; margin-top:1rem; }
+.tag-suggestions { border: 1px solid #ccc; background: white; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 1rem); z-index: 1000; }
+.tag-suggestions div { padding:0.4rem; cursor:pointer; }
+.tag-suggestions div:hover { background: #ff3cac; color: white; }
 </style>
 </head>
 <body>
-<h1>Mixcloud Upload Tool</h1>
+<canvas id="sparkleCanvas"></canvas>
+
+<div id="form-container">
+<h1>Dublab.🐈‍⬛ Mixcloud Upload Tool</h1>
 
 <form id="upload-form">
   <label>MP3 File</label>
@@ -52,8 +93,28 @@
   <button type="submit">Upload to Mixcloud</button>
   <div id="status"></div>
 </form>
+</div>
 
 <script>
+// --- Sparkle canvas ---
+const canvas=document.getElementById('sparkleCanvas');
+const ctx=canvas.getContext('2d'); let w,h;
+function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+window.addEventListener('resize',resize); resize();
+
+const sparkleImg=document.createElement('canvas'); const spCtx=sparkleImg.getContext('2d');
+sparkleImg.width=sparkleImg.height=6; spCtx.fillStyle='white'; spCtx.beginPath(); spCtx.arc(3,3,3,0,Math.PI*2); spCtx.fill();
+
+class Particle{ constructor(){this.reset();}
+reset(){this.x=Math.random()*w; this.y=Math.random()*h; this.vx=(Math.random()-0.5)*0.4; this.vy=(Math.random()-0.5)*0.4; this.alpha=Math.random()*0.6+0.4; this.size=Math.random()*2+1;}
+update(){this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>w||this.y<0||this.y>h)this.reset();}
+draw(){ctx.globalAlpha=this.alpha; ctx.drawImage(sparkleImg,this.x,this.y,this.size*3,this.size*3); ctx.globalAlpha=1;}
+}
+const particles=[]; for(let i=0;i<50;i++)particles.push(new Particle());
+let then=0; function animate(now){ requestAnimationFrame(animate); if(now-then<33)return; then=now; ctx.clearRect(0,0,w,h); particles.forEach(p=>{p.update();p.draw();}); }
+animate();
+
+// --- Form logic (from your last working version) ---
 const backendURL = window.location.origin;
 const fileInput = document.getElementById("file");
 const titleInput = document.getElementById("title");
@@ -68,7 +129,6 @@ let currentTags = [];
 let showsMetadata = {};
 let allTags = new Set();
 
-// Load show metadata
 fetch(`${backendURL}/shows_metadata`)
   .then(res => res.json())
   .then(data => {
@@ -76,12 +136,9 @@ fetch(`${backendURL}/shows_metadata`)
     Object.values(data).forEach(show => (show.tags || []).forEach(tag => allTags.add(tag)));
   });
 
-// Handle file input
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) return;
-
-  // --- Clear all fields first ---
   titleInput.value = "";
   hostInput.value = "";
   document.getElementById("day").value = "";
@@ -92,19 +149,15 @@ fileInput.addEventListener("change", () => {
 
   const filename = file.name.replace(".mp3", "");
   const dateMatch = filename.match(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/);
-
-  // Auto-fill date boxes if filename contains a date
   if (dateMatch) {
     document.getElementById("day").value = dateMatch[1].padStart(2,"0");
     document.getElementById("month").value = dateMatch[2].padStart(2,"0");
     document.getElementById("year").value = dateMatch[3];
   }
 
-  // Remove date from title
   const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim();
   titleInput.value = cleanTitle;
 
-  // Match title with CSV metadata
   const possibleShow = Object.keys(showsMetadata).find(show => cleanTitle.toLowerCase().includes(show.toLowerCase()));
   if (possibleShow) {
     const meta = showsMetadata[possibleShow];
@@ -114,7 +167,6 @@ fileInput.addEventListener("change", () => {
   }
 });
 
-// Tag input
 tagInput.addEventListener("keydown", e => {
   if (e.key === "Enter") {
     e.preventDefault();
@@ -172,7 +224,6 @@ function renderTags() {
   });
 }
 
-// Submit form
 form.addEventListener("submit", async e => {
   e.preventDefault();
   statusDiv.textContent = "Uploading...";
