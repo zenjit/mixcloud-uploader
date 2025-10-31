@@ -255,7 +255,7 @@ if __name__ == "__main__":
     auth = MixcloudAuth(
         client_id=os.getenv("MIXCLOUD_CLIENT_ID"),
         client_secret=os.getenv("MIXCLOUD_CLIENT_SECRET"),
-        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080"),
+        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080/callback"),
     )
 
     uvicorn.run("mixcloud_backend:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
@@ -264,5 +264,5 @@ else:
     auth = MixcloudAuth(
         client_id=os.getenv("MIXCLOUD_CLIENT_ID"),
         client_secret=os.getenv("MIXCLOUD_CLIENT_SECRET"),
-        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080"),
+        redirect_uri=os.getenv("REDIRECT_URI", "http://localhost:8080/callback"),
     )
