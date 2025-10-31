@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dublab.cat Mixcloud Upload Tool</title>
+<title>Mixcloud Upload Tool</title>
 <style>
 html, body { margin:0; padding:0; height:100%; overflow:hidden; font-family: system-ui, sans-serif; }
 
@@ -58,7 +58,7 @@ button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#
 <canvas id="sparkleCanvas"></canvas>
 
 <div id="form-container">
-  <h1>Dublab.🐈‍⬛ Mixcloud Upload Tool</h1>
+  <h1>Mixcloud Upload Tool</h1>
   <form id="upload-form">
     <label>MP3 File</label>
     <input type="file" id="file" name="file" accept=".mp3" required />
@@ -96,7 +96,6 @@ let w,h;
 function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
 window.addEventListener('resize',resize); resize();
 
-// Pre-rendered sparkle
 const sparkleImg = document.createElement('canvas');
 const spCtx = sparkleImg.getContext('2d');
 sparkleImg.width=sparkleImg.height=6;
@@ -113,7 +112,6 @@ function animate(now){ requestAnimationFrame(animate); if(now-then<33)return; th
 animate();
 
 // ---------- Form Handling ----------
-const backendURL = window.location.origin;
 const fileInput=document.getElementById("file");
 const titleInput=document.getElementById("title");
 const hostInput=document.getElementById("host");
@@ -124,12 +122,29 @@ const form=document.getElementById("upload-form");
 const statusDiv=document.getElementById("status");
 
 let currentTags=[]; let showsMetadata={}; let allTags=new Set();
+let backendURL="";
 
-fetch(`${backendURL}/shows_metadata`).then(r=>r.json()).then(data=>{
-  showsMetadata=data;
-  Object.values(data).forEach(show=>(show.tags||[]).forEach(tag=>allTags.add(tag)));
-});
+// Detect backend URL dynamically
+async function detectBackend(){
+  try{
+    let res = await fetch(`${window.location.origin}/shows_metadata`);
+    if(res.ok) backendURL = window.location.origin;
+    else backendURL = "https://your-backend-railway-url.up.railway.app";
+  }catch(err){ backendURL = "https://your-backend-railway-url.up.railway.app"; }
+}
+await detectBackend();
 
+// Load metadata
+async function loadMetadata(){
+  try{
+    const res = await fetch(`${backendURL}/shows_metadata`);
+    showsMetadata = await res.json();
+    Object.values(showsMetadata).forEach(show => (show.tags||[]).forEach(tag => allTags.add(tag)));
+  }catch(err){ console.error("Failed to load shows metadata:", err); }
+}
+loadMetadata();
+
+// Handle file upload & auto-fill
 fileInput.addEventListener("change",()=>{
   currentTags=[]; tagContainer.innerHTML=""; statusDiv.textContent="";
 
@@ -137,19 +152,29 @@ fileInput.addEventListener("change",()=>{
   const filename=file.name.replace(".mp3","");
   const dateMatch=filename.match(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/);
 
-  if(dateMatch){ document.getElementById("day").value=dateMatch[1]; document.getElementById("month").value=dateMatch[2]; document.getElementById("year").value=dateMatch[3]; }
-  else{ document.getElementById("day").value=""; document.getElementById("month").value=""; document.getElementById("year").value=""; }
+  if(dateMatch){
+    document.getElementById("day").value=dateMatch[1];
+    document.getElementById("month").value=dateMatch[2];
+    document.getElementById("year").value=dateMatch[3];
+  }else{
+    document.getElementById("day").value="";
+    document.getElementById("month").value="";
+    document.getElementById("year").value="";
+  }
 
-  const cleanTitle=filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/,"").trim();
-  titleInput.value=cleanTitle;
+  const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/,"").trim();
+  titleInput.value = cleanTitle;
 
-  const possibleShow=Object.keys(showsMetadata).find(show=>cleanTitle.toLowerCase().includes(show.toLowerCase()));
-  if(possibleShow){ const meta=showsMetadata[possibleShow]; hostInput.value=meta.host||""; currentTags=[...(meta.tags||[])]; renderTags(); }
+  const possibleShow = Object.keys(showsMetadata).find(show => cleanTitle.toLowerCase().includes(show.toLowerCase()));
+  if(possibleShow){
+    const meta = showsMetadata[possibleShow];
+    hostInput.value = meta.host || "";
+    currentTags = [...(meta.tags||[])];
+    renderTags();
+  }
 });
 
-tagInput.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); const tag=tagInput.value.trim(); if(tag&&!currentTags.includes(tag)){ currentTags.push(tag); renderTags(); tagInput.value=""; hideSuggestions(); } }});
-tagInput.addEventListener("input",()=>{ const value=tagInput.value.trim().toLowerCase(); if(!value)return hideSuggestions(); const matches=Array.from(allTags).filter(tag=>tag.toLowerCase().includes(value)&&!currentTags.includes(tag)); showSuggestions(matches);});
-function showSuggestions(matches){ tagSuggestionsDiv.innerHTML=""; if(matches.length===0){tagSuggestionsDiv.style.display="none"; return;} matches.forEach(tag=>{const div=document.createElement("div"); div.textContent=tag; div.onclick=()=>{currentTags.push(tag); renderTags(); tagInput.value=""; hideSuggestions();}; tagSuggestionsDiv.appendChild(div);}); tagSuggestionsDiv.style.display="block"; }
-function hideSuggestions(){ tagSuggestionsDiv.style.display="none"; }
-function renderTags(){ tagContainer.innerHTML=""; currentTags.forEach(tag=>{ const chip=document.createElement("div"); chip.className="tag-chip"; chip.innerHTML=`${tag} <span>&times;</span>`; chip.onclick=()=>{ currentTags=currentTags.filter(t=>t!==tag); renderTags(); }; tagContainer.appendChild(chip);}); }
-
+// --- Tags ---
+tagInput.addEventListener("keydown", e=>{
+  if(e.key==="Enter"){ e.preventDefault(); const tag=tagInput.value.trim();
+  if(tag&&!currentTags
