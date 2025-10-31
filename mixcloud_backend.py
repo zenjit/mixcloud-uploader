@@ -3,6 +3,7 @@ import csv
 import logging
 import requests
 import webbrowser
+from difflib import get_close_matches
 from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
@@ -108,10 +109,11 @@ class MixcloudAuth:
 # Mixcloud Uploader
 # -----------------------
 class MixcloudUploader:
-    def __init__(self, auth, shows_folder, metadata_file):
+    def __init__(self, auth, shows_folder, metadata_file, img_folder="images"):
         self.auth = auth
         self.shows_folder = shows_folder
         self.metadata_file = metadata_file
+        self.img_folder = Path(img_folder)
         self.metadata = self.load_metadata()
 
     def load_metadata(self):
@@ -133,28 +135,46 @@ class MixcloudUploader:
         logging.info(f"Loaded metadata for {len(metadata)} shows")
         return metadata
 
-    def find_best_match(self, name):
-        """Loose match for show name from CSV"""
-        from difflib import get_close_matches
+    def find_best_match_name(self, query):
+        """Find the best show name match from CSV using fuzzy matching."""
         candidates = list(self.metadata.keys())
-        matches = get_close_matches(name.lower(), [c.lower() for c in candidates], n=1, cutoff=0.6)
-        if not matches:
-            return {}
-        for key in candidates:
-            if key.lower() == matches[0]:
-                return self.metadata[key]
-        return {}
-
-    def find_image(self, show_name):
-        """Try to find an image file in ./images/ matching the show name"""
-        img_folder = Path("images")
-        if not img_folder.exists():
+        if not candidates:
             return None
-        base_name = show_name.lower().replace(" ", "_")
-        for ext in [".jpg", ".jpeg", ".png", ".webp"]:
-            candidate = img_folder / f"{base_name}{ext}"
-            if candidate.exists():
-                return str(candidate)
+        matches = get_close_matches(query.lower(), [c.lower() for c in candidates], n=1, cutoff=0.6)
+        if not matches:
+            return None
+        for name in candidates:
+            if name.lower() == matches[0]:
+                return name
+        return None
+
+    def find_best_match_meta(self, name):
+        """Return metadata for best match."""
+        matched_name = self.find_best_match_name(name)
+        if matched_name:
+            return self.metadata[matched_name], matched_name
+        return {}, name
+
+    def find_best_match_image(self, name):
+        """Use the same fuzzy logic to find a matching image file."""
+        if not self.img_folder.exists():
+            logging.warning(f"Image folder not found: {self.img_folder}")
+            return None
+
+        images = [f for f in self.img_folder.iterdir() if f.suffix.lower() in [".jpg", ".jpeg", ".png", ".webp"]]
+        if not images:
+            return None
+
+        # Extract base names
+        names = [img.stem for img in images]
+        matches = get_close_matches(name.lower(), [n.lower() for n in names], n=1, cutoff=0.6)
+        if matches:
+            best = matches[0]
+            for img in images:
+                if img.stem.lower() == best:
+                    logging.info(f"🖼 Found matching image: {img.name}")
+                    return img
+        logging.info(f"⚠️ No matching image found for {name}")
         return None
 
     def upload(self, mp3_path, title=None, host=None, tags=None, date_str=None):
@@ -164,11 +184,10 @@ class MixcloudUploader:
         files = {"mp3": open(mp3_path, "rb")}
 
         show_name = title or os.path.basename(mp3_path).replace(".mp3", "")
-        meta = self.find_best_match(show_name)
+        meta, matched_name = self.find_best_match_meta(show_name)
         bio = meta.get("bio", "").strip()
         csv_host = meta.get("host", "").strip()
         csv_tags = meta.get("tags", [])
-        image_path = self.find_image(show_name)
 
         final_host = host or csv_host
         final_tags = tags or csv_tags[:5]
@@ -178,26 +197,21 @@ class MixcloudUploader:
             description_parts.append(bio)
         if date_str:
             description_parts.append(
-                f"Tracklist: http://dublab.cat/shows/{show_name.lower().replace(' ', '-')}/{date_str}"
+                f"Tracklist: http://dublab.cat/shows/{matched_name.lower().replace(' ', '-')}/{date_str}"
             )
         description = "\n\n".join(description_parts) or "Uploaded via Mixcloud Uploader"
 
-        show_name = f"{show_name} {date_str} w/ {final_host}"
-        data = {"name": show_name, "description": description}
+        full_show_title = f"{matched_name} {date_str} w/ {final_host}"
+        data = {"name": full_show_title, "description": description}
         for i, tag in enumerate(final_tags[:5]):
             data[f"tags-{i}-tag"] = tag
 
-        # Include image if found
-        if image_path:
-            try:
-                files["picture"] = open(image_path, "rb")
-                logging.info(f"✅ Using image {image_path}")
-            except Exception as e:
-                logging.warning(f"⚠️ Could not open image file '{image_path}': {e}")
-        else:
-            logging.info("🖼️ No image found for this show")
+        # ✅ Reuse same fuzzy logic for the image
+        img_path = self.find_best_match_image(matched_name)
+        if img_path:
+            files["picture"] = open(img_path, "rb")
 
-        logging.info(f"Uploading '{show_name}' with tags {final_tags} and host '{final_host}'")
+        logging.info(f"Uploading '{full_show_title}' with tags {final_tags} and host '{final_host}'")
 
         try:
             resp = requests.post(url, files=files, data=data)
@@ -219,7 +233,6 @@ class MixcloudUploader:
         else:
             logging.error(f"❌ Upload failed: {resp.status_code} {resp.text}")
             return False
-
 
 # -----------------------
 # FastAPI App for Railway
