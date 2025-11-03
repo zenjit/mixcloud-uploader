@@ -58,6 +58,9 @@ button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#
 .tag-suggestions { border: 1px solid #ccc; background: white; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 1rem); z-index: 1000; }
 .tag-suggestions div { padding:0.4rem; cursor:pointer; }
 .tag-suggestions div:hover { background: #ff3cac; color: white; }
+
+/* Show not found message */
+#show-warning { color:#c00; font-size:0.9rem; margin-left:1rem; opacity:0; transition: opacity 0.5s ease; display:inline-block; vertical-align:middle; }
 </style>
 </head>
 <body>
@@ -90,7 +93,8 @@ button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#
   </div>
   <div id="tag-container"></div>
 
-  <button type="submit">Upload to Mixcloud</button>
+  <button type="submit" id="upload-button">Upload to Mixcloud</button>
+  <span id="show-warning">Show not found in shows.csv, check the file name or let someone know :)</span>
   <div id="status"></div>
 </form>
 </div>
@@ -114,7 +118,7 @@ const particles=[]; for(let i=0;i<50;i++)particles.push(new Particle());
 let then=0; function animate(now){ requestAnimationFrame(animate); if(now-then<33)return; then=now; ctx.clearRect(0,0,w,h); particles.forEach(p=>{p.update();p.draw();}); }
 animate();
 
-// --- Form logic (from your last working version) ---
+// --- Form logic ---
 const backendURL = window.location.origin;
 const fileInput = document.getElementById("file");
 const titleInput = document.getElementById("title");
@@ -124,6 +128,8 @@ const tagContainer = document.getElementById("tag-container");
 const tagSuggestionsDiv = document.getElementById("tag-suggestions");
 const form = document.getElementById("upload-form");
 const statusDiv = document.getElementById("status");
+const uploadButton = document.getElementById("upload-button");
+const showWarning = document.getElementById("show-warning");
 
 let currentTags = [];
 let showsMetadata = {};
@@ -139,6 +145,8 @@ fetch(`${backendURL}/shows_metadata`)
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) return;
+
+  // --- Reset fields ---
   titleInput.value = "";
   hostInput.value = "";
   document.getElementById("day").value = "";
@@ -164,6 +172,13 @@ fileInput.addEventListener("change", () => {
     hostInput.value = meta.host || "";
     currentTags = [...(meta.tags || [])];
     renderTags();
+    // Hide warning and restore button text
+    showWarning.style.opacity = 0;
+    uploadButton.textContent = "Upload to Mixcloud";
+  } else {
+    // Show warning and change button text
+    showWarning.style.opacity = 1;
+    uploadButton.textContent = "Upload to Mixcloud anyway";
   }
 });
 
