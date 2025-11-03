@@ -202,7 +202,7 @@ class MixcloudUploader:
         description = "\n\n".join(description_parts) or "Uploaded via Mixcloud Uploader"
 
         full_show_title = f"{matched_name} {date_str} w/ {final_host}"
-        data = {"name": full_show_title, "description": description}
+        data = {"name": full_show_title, "description": description, "hide_stats": "true"}
         for i, tag in enumerate(final_tags[:5]):
             data[f"tags-{i}-tag"] = tag
 
