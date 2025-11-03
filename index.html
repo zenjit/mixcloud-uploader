@@ -13,11 +13,7 @@ body {
   animation: rainbowGradient 30s ease infinite;
   display:flex; justify-content:center; align-items:center;
 }
-@keyframes rainbowGradient {
-  0% {background-position:0% 50%}
-  50% {background-position:100% 50%}
-  100% {background-position:0% 50%}
-}
+@keyframes rainbowGradient { 0% {background-position:0% 50%} 50% {background-position:100% 50%} 100% {background-position:0% 50%} }
 body::before {
   content:"";
   position:absolute; top:0; left:0; width:100%; height:100%;
@@ -26,27 +22,17 @@ body::before {
   animation:ripple 12s linear infinite;
   pointer-events:none; z-index:0;
 }
-@keyframes ripple {
-  0% {transform:translate(0,0) scale(1);}
-  50% {transform:translate(25px,25px) scale(1.03);}
-  100% {transform:translate(0,0) scale(1);}
-}
+@keyframes ripple { 0% {transform:translate(0,0) scale(1);} 50% {transform:translate(25px,25px) scale(1.03);} 100% {transform:translate(0,0) scale(1);} }
 
 /* Sparkle canvas */
 canvas#sparkleCanvas {position:absolute; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none;}
 
 /* ---------- Form styling ---------- */
-#form-container {
-  position:relative; z-index:1;
-  background: rgba(255,255,255,0.95);
-  padding: 2rem; border-radius:16px;
-  max-width:700px; width:90%;
-  box-shadow:0 0 30px rgba(0,0,0,0.3);
-}
+#form-container { position:relative; z-index:1; background: rgba(255,255,255,0.95); padding: 2rem; border-radius:16px; max-width:700px; width:90%; box-shadow:0 0 30px rgba(0,0,0,0.3); }
 h1 { font-size:1.6rem; margin-bottom:1rem; text-align:center; color:#222; text-shadow:0 0 8px #fff,0 0 12px #ff3cac,0 0 20px #784ba0; }
 label { display:block; margin-top:1rem; font-weight:bold; color:#222; }
-input, button, datalist { font-size:1rem; padding:0.5rem; width:100%; box-sizing:border-box; margin-top:0.3rem; border-radius:6px; border:1px solid #ccc; }
-input:focus { outline:none; border-color:#ff3cac; box-shadow:0 0 12px #ff3cac66,0 0 20px #784ba099; }
+input, button, datalist, textarea { font-size:1rem; padding:0.5rem; width:100%; box-sizing:border-box; margin-top:0.3rem; border-radius:6px; border:1px solid #ccc; }
+input:focus, textarea:focus { outline:none; border-color:#ff3cac; box-shadow:0 0 12px #ff3cac66,0 0 20px #784ba099; }
 button { width:auto; background:linear-gradient(45deg,#ff3cac,#784ba0,#2b86c5); color:white; border:none; cursor:pointer; margin-top:1.5rem; transition: transform 0.2s; }
 button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#2b86c5,#ff9a3c); }
 
@@ -58,8 +44,6 @@ button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#
 .tag-suggestions { border: 1px solid #ccc; background: white; position: absolute; max-height: 150px; overflow-y: auto; width: calc(100% - 1rem); z-index: 1000; }
 .tag-suggestions div { padding:0.4rem; cursor:pointer; }
 .tag-suggestions div:hover { background: #ff3cac; color: white; }
-
-/* Show not found message */
 #show-warning { color:#c00; font-size:0.9rem; margin-left:1rem; opacity:0; transition: opacity 0.5s ease; display:inline-block; vertical-align:middle; }
 </style>
 </head>
@@ -93,22 +77,24 @@ button:hover { transform:scale(1.05); background:linear-gradient(45deg,#784ba0,#
   </div>
   <div id="tag-container"></div>
 
+  <label>Description</label>
+  <textarea id="description" name="description" rows="4"></textarea>
+
   <button type="submit" id="upload-button">Upload to Mixcloud</button>
-  <span id="show-warning">Show not found in shows.csv, check the file name or let someone know :)</span>
+  <button type="button" id="refresh-shows-button" style="margin-left:10px;background:#2b86c5;">Refresh Shows</button>
+  <span id="show-warning">Show not found in shows.json, check the file name or let someone know :)</span>
   <div id="status"></div>
 </form>
 </div>
 
 <script>
-// --- Sparkle canvas ---
+// ---------- Sparkle Canvas ----------
 const canvas=document.getElementById('sparkleCanvas');
 const ctx=canvas.getContext('2d'); let w,h;
 function resize(){ w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
 window.addEventListener('resize',resize); resize();
-
 const sparkleImg=document.createElement('canvas'); const spCtx=sparkleImg.getContext('2d');
 sparkleImg.width=sparkleImg.height=6; spCtx.fillStyle='white'; spCtx.beginPath(); spCtx.arc(3,3,3,0,Math.PI*2); spCtx.fill();
-
 class Particle{ constructor(){this.reset();}
 reset(){this.x=Math.random()*w; this.y=Math.random()*h; this.vx=(Math.random()-0.5)*0.4; this.vy=(Math.random()-0.5)*0.4; this.alpha=Math.random()*0.6+0.4; this.size=Math.random()*2+1;}
 update(){this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>w||this.y<0||this.y>h)this.reset();}
@@ -118,7 +104,7 @@ const particles=[]; for(let i=0;i<50;i++)particles.push(new Particle());
 let then=0; function animate(now){ requestAnimationFrame(animate); if(now-then<33)return; then=now; ctx.clearRect(0,0,w,h); particles.forEach(p=>{p.update();p.draw();}); }
 animate();
 
-// --- Form logic ---
+// ---------- Form Logic ----------
 const backendURL = window.location.origin;
 const fileInput = document.getElementById("file");
 const titleInput = document.getElementById("title");
@@ -126,32 +112,41 @@ const hostInput = document.getElementById("host");
 const tagInput = document.getElementById("tag-input");
 const tagContainer = document.getElementById("tag-container");
 const tagSuggestionsDiv = document.getElementById("tag-suggestions");
+const descriptionInput = document.getElementById("description");
 const form = document.getElementById("upload-form");
 const statusDiv = document.getElementById("status");
 const uploadButton = document.getElementById("upload-button");
 const showWarning = document.getElementById("show-warning");
+const refreshShowsButton = document.getElementById("refresh-shows-button");
 
 let currentTags = [];
 let showsMetadata = {};
 let allTags = new Set();
 
-fetch(`${backendURL}/shows_metadata`)
-  .then(res => res.json())
-  .then(data => {
-    showsMetadata = data;
-    Object.values(data).forEach(show => (show.tags || []).forEach(tag => allTags.add(tag)));
-  });
+function loadShowsMetadata() {
+  fetch(`${backendURL}/shows_metadata`)
+    .then(res => res.json())
+    .then(data => {
+      showsMetadata = {};
+      allTags.clear();
+      data.forEach(show => {
+        showsMetadata[show.name.toLowerCase()] = show;
+        (show.tags || []).forEach(tag => allTags.add(tag));
+      });
+    });
+}
+loadShowsMetadata();
 
 fileInput.addEventListener("change", () => {
   const file = fileInput.files[0];
   if (!file) return;
 
-  // --- Reset fields ---
   titleInput.value = "";
   hostInput.value = "";
   document.getElementById("day").value = "";
   document.getElementById("month").value = "";
   document.getElementById("year").value = "";
+  descriptionInput.value = "";
   currentTags = [];
   renderTags();
 
@@ -170,13 +165,12 @@ fileInput.addEventListener("change", () => {
   if (possibleShow) {
     const meta = showsMetadata[possibleShow];
     hostInput.value = meta.host || "";
+    descriptionInput.value = meta.description || "";
     currentTags = [...(meta.tags || [])];
     renderTags();
-    // Hide warning and restore button text
     showWarning.style.opacity = 0;
     uploadButton.textContent = "Upload to Mixcloud";
   } else {
-    // Show warning and change button text
     showWarning.style.opacity = 1;
     uploadButton.textContent = "Upload to Mixcloud anyway";
   }
@@ -204,26 +198,16 @@ tagInput.addEventListener("input", () => {
 
 function showSuggestions(matches) {
   tagSuggestionsDiv.innerHTML = "";
-  if (matches.length === 0) {
-    tagSuggestionsDiv.style.display = "none";
-    return;
-  }
+  if (matches.length === 0) { tagSuggestionsDiv.style.display = "none"; return; }
   matches.forEach(tag => {
     const div = document.createElement("div");
     div.textContent = tag;
-    div.onclick = () => {
-      currentTags.push(tag);
-      renderTags();
-      tagInput.value = "";
-      hideSuggestions();
-    };
+    div.onclick = () => { currentTags.push(tag); renderTags(); tagInput.value=""; hideSuggestions(); };
     tagSuggestionsDiv.appendChild(div);
   });
   tagSuggestionsDiv.style.display = "block";
 }
-
 function hideSuggestions() { tagSuggestionsDiv.style.display = "none"; }
-
 function renderTags() {
   tagContainer.innerHTML = "";
   currentTags.forEach(tag => {
@@ -231,10 +215,7 @@ function renderTags() {
     chip.className = "tag-chip";
     chip.title = "Click to remove";
     chip.innerHTML = `${tag} <span>&times;</span>`;
-    chip.onclick = () => {
-      currentTags = currentTags.filter(t => t !== tag);
-      renderTags();
-    };
+    chip.onclick = () => { currentTags = currentTags.filter(t => t !== tag); renderTags(); };
     tagContainer.appendChild(chip);
   });
 }
@@ -249,6 +230,7 @@ form.addEventListener("submit", async e => {
   formData.append("title", titleInput.value.trim());
   formData.append("host", hostInput.value.trim());
   formData.append("tags", currentTags.join(","));
+  formData.append("description", descriptionInput.value.trim());
   formData.append("day", document.getElementById("day").value);
   formData.append("month", document.getElementById("month").value);
   formData.append("year", document.getElementById("year").value);
@@ -256,23 +238,27 @@ form.addEventListener("submit", async e => {
   try {
     const res = await fetch(`${backendURL}/upload`, { method: "POST", body: formData });
     const result = await res.json();
-    if (result.success) {
-      statusDiv.textContent = "✅ Upload successful!";
-      statusDiv.className = "success";
-    } else {
-      statusDiv.textContent = "❌ Upload failed. Check logs.";
-      statusDiv.className = "error";
-    }
-  } catch (err) {
+    if (result.success) { statusDiv.textContent="✅ Upload successful!"; statusDiv.className="success"; }
+    else { statusDiv.textContent="❌ Upload failed. Check logs."; statusDiv.className="error"; }
+  } catch(err) { console.error(err); statusDiv.textContent="⚠️ Error during upload."; statusDiv.className="error"; }
+});
+
+refreshShowsButton.addEventListener("click", async () => {
+  statusDiv.textContent = "Refreshing shows...";
+  statusDiv.className = "";
+  try {
+    await fetch(`${backendURL}/refresh_shows`, { method: "POST" });
+    loadShowsMetadata();
+    statusDiv.textContent = "✅ Shows refreshed!";
+    statusDiv.className = "success";
+  } catch(err) {
     console.error(err);
-    statusDiv.textContent = "⚠️ Error during upload.";
+    statusDiv.textContent = "❌ Failed to refresh shows.";
     statusDiv.className = "error";
   }
 });
 
-document.addEventListener("click", e => {
-  if (!tagSuggestionsDiv.contains(e.target) && e.target !== tagInput) hideSuggestions();
-});
+document.addEventListener("click", e => { if(!tagSuggestionsDiv.contains(e.target) && e.target !== tagInput) hideSuggestions(); });
 </script>
 </body>
 </html>
