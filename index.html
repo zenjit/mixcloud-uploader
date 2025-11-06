@@ -153,9 +153,9 @@ fileInput.addEventListener("change", () => {
   const filename = file.name.replace(".mp3", "");
   const dateMatch = filename.match(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/);
   if (dateMatch) {
-    document.getElementById("day").value = dateMatch[1].padStart(2,"0");
+    document.getElementById("day").value = dateMatch[3].padStart(2,"0");
     document.getElementById("month").value = dateMatch[2].padStart(2,"0");
-    document.getElementById("year").value = dateMatch[3];
+    document.getElementById("year").value = dateMatch[1];
   }
 
   const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim();

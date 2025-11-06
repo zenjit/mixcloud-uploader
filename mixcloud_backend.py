@@ -132,7 +132,7 @@ class MixcloudUploader:
                     return show
         return None
 
-    def upload(self, mp3_path, title=None, host=None, tags=None, description=None, date_str=None):
+    def upload(self, mp3_path, title=None, host=None, tags=None, description=None, date_str=None, date_str_for_title=None):
         token = self.auth.get_token()
         url = f"https://api.mixcloud.com/upload/?access_token={token}"
 
@@ -147,7 +147,7 @@ class MixcloudUploader:
             final_description += f"\n\nTracklist: http://dublab.cat/shows/{show_meta.get('slug','')}/{date_str}"
 
         data = {
-            "name": f"{show_meta.get('name', title)} {date_str or ''} w/ {final_host}".strip(),
+            "name": f"{show_meta.get('name', title)} {date_str_for_title or ''} w/ {final_host}".strip(),
             "description": final_description or "Uploaded via Mixcloud Uploader",
             "hide_stats": "true"
         }
@@ -228,10 +228,11 @@ async def upload_to_mixcloud(
         f.write(await file.read())
 
     date_str = f"{day}-{month}-{year}".strip("-")
+    date_str_for_title = f"{day}.{month}.{year}".strip("-")
     tag_list = [t.strip() for t in tags.split(",") if t.strip()]
 
     uploader = MixcloudUploader(auth)
-    success = uploader.upload(str(temp_path), title, host, tag_list, description, date_str)
+    success = uploader.upload(str(temp_path), title, host, tag_list, description, date_str, date_str_for_title)
 
     try:
         os.remove(temp_path)
