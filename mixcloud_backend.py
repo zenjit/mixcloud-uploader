@@ -143,7 +143,10 @@ class MixcloudUploader:
         final_tags = tags or show_meta.get("tags", [])[:5]
         final_description = description or show_meta.get("description", "")
 
-        if date_str:
+        if show_meta.get('name') == "b-sides":
+            host_clean = re.sub(r'-+', '-', re.sub(r'\s+', '-', final_host.replace('&', '').strip()))
+            final_description += f"\n\nTracklist: http://dublab.cat/b-sides/{host_clean}"
+        elif date_str:
             final_description += f"\n\nTracklist: http://dublab.cat/shows/{show_meta.get('slug','')}/{date_str}"
 
         data = {
