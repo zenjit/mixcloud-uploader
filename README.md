@@ -1,1 +1,1 @@
-uvicorn backend:app --reload --host 0.0.0.0 --port 8000
+uvicorn mixcloud_backend:app --reload --host 0.0.0.0 --port 8000
