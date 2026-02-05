@@ -158,7 +158,7 @@ fileInput.addEventListener("change", () => {
     document.getElementById("year").value = dateMatch[1];
   }
 
-  const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim();
+  const cleanTitle = filename.replace(/(\d{1,2})[.\-_ ](\d{1,2})[.\-_ ](\d{2})/, "").trim().normalize("NFC");
   titleInput.value = cleanTitle;
 
   const possibleShow = Object.keys(showsMetadata).find(show => cleanTitle.toLowerCase().includes(show.toLowerCase()));
