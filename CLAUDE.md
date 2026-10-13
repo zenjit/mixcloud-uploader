@@ -34,14 +34,15 @@ Two files hold all the logic:
 ### Data flow
 
 ```
-radio API (paginated)  ──generate_shows_json()──▶  shows.json  (normalized cache)
+Dublab v2 API (skip/take)  ──generate_shows_json()──▶  shows.json  (normalized cache)
                                                      │
                      GET /shows_metadata ◀───────────┤
                             │                        │
    index.html: parse filename → prefill form         │
                             │                        │
                      POST /upload ──▶ MixcloudUploader.upload()
-                                        ├─ find_best_match(title) in shows.json
+                                        ├─ lookup_show(title): cache match → GET /profiles/slug/{slug}
+                                        │    (no match → GET /profiles?isCurrent=true&take=1&search=)
                                         ├─ download picture from show_meta.picture
                                         └─ POST https://api.mixcloud.com/upload/
 ```
@@ -71,12 +72,23 @@ radio API (paginated)  ──generate_shows_json()──▶  shows.json  (normal
 }
 ```
 
-### Current source API (Dublab)
+### Source API (Dublab v2)
 
-- Base: `https://api.dublab.cat/api`. Endpoint: `GET /profiles/?page=N`. No auth.
-- Django REST Framework–style pagination: `{"count": int, "results": [...]}`. Page size is inferred from the length of page 1.
-- `fetch_all_profiles()` fetches page 1, then pages 2..N in parallel (10 threads). A failed page is logged and skipped.
-- `extract_current_profiles()` keeps only `is_current == true` profiles and maps them to the schema above. Raw fields used: `id, name, host, tags, description, picture, slug, is_current`.
+Base `https://v2.dublab.cat/api/v1`, NestJS backend, no auth for reads. The OpenAPI spec is at `https://v2.dublab.cat/api/docs-json` (Swagger UI at `/api/docs`). Switched from the old `https://api.dublab.cat/api` (DRF, `?page=N`) on 2026-10-13.
+
+| Call | Function | Use |
+|---|---|---|
+| `GET /profiles?isCurrent=true&skip=N&take=100` | `fetch_current_profiles()` | Builds `shows.json`. Returns a **plain JSON array** (no count/envelope); paging stops at a short page. `GET /profiles/count?isCurrent=true` → `{"count": n}` exists but isn't used. |
+| `GET /profiles/slug/{slug}` | `fetch_profile_by_slug()` | At upload, re-fetches the matched show so metadata is fresh. 404 (`NotFoundException`) → `None`. Also returns a `shows` array (past episodes, each with `mixcloudUrl`), which is ignored. |
+| `GET /profiles?isCurrent=true&take=1&search=…` | `search_current_profile()` | Upload fallback when the cached difflib match fails. |
+
+- Raw profile fields: `id, name, host (str), tags (list[str]), isCurrent, slug, description, bio, picture, links, createdAt, updatedAt` (+ `_count` on lists and `shows` on the slug call). `normalize_profile()` maps them onto the schema above.
+- **Pictures are relative paths.** `resolve_picture_url()` maps them as follows:
+  - `profiles/…` → `https://v2.dublab.cat/uploads/…` (new uploads).
+  - `photos/…` → `https://api.dublab.cat/media/…` (legacy images, **still only on the old server**; most profiles in Oct 2026). If the old server is shut down, these break: find their new location and update `LEGACY_PICTURE_BASE_URL`.
+  - An empty `picture` (`""`) becomes `null`, and the upload goes out with no cover.
+- Image types include jpeg, png and webp. The upload forwards the image server's `Content-Type`.
+- `b-sides` exists (slug `b-sides`) but has `isCurrent: false`, so it is not in `shows.json` and is not found by the search fallback. The b-sides tracklist special case therefore can't trigger right now. The API also has a separate b-sides resource (`CreateBsideDto` in the spec), which may be the proper source for b-sides.
 
 ### Filename conventions (in `index.html`, file-input `change` handler)
 
@@ -87,14 +99,14 @@ radio API (paginated)  ──generate_shows_json()──▶  shows.json  (normal
 
 ### Upload logic (`MixcloudUploader.upload`)
 
-- **Backend match:** `difflib.get_close_matches(title, names, cutoff=0.6)`. This differs from the frontend's substring match, so the two can disagree. When the backend finds nothing, the Mixcloud title falls back to the raw form title, and there's no picture and no slug.
+- **Backend match** (`lookup_show`): `difflib.get_close_matches(title, names, cutoff=0.6)` against `shows.json`, then a fresh copy via the slug endpoint. With no cache match, it tries the API search. If the API is unreachable, it uses the cached entry. The difflib match differs from the frontend's substring match, so the two can disagree. When nothing matches, the Mixcloud title falls back to the raw form title, and there's no picture and no slug.
 - Form values override show metadata: `host or meta.host`, `tags or meta.tags[:5]`, `description or meta.description`.
 - **Mixcloud title:** `"{show name} {DD.MM.YY} w/ {host}"`.
 - **Tracklist link** appended to the description:
   - Show `b-sides`: `http://dublab.cat/b-sides/{host-slugified}` (`&` removed, whitespace collapsed to `-`).
   - Any other show with a date: `http://dublab.cat/shows/{slug}/{DD-MM-YY}`.
 - Always sends `hide_stats=true`. Tags go as `tags-{i}-tag` form fields (max 5).
-- The picture is streamed from the API URL and sent as `picture` with a hard-coded `image/jpeg` content type.
+- The picture is streamed from its URL and sent as `picture` with the image server's `Content-Type`. A failed download is logged and the upload continues without a cover.
 - The MP3 is first written to `uploads/<original filename>` and deleted after the upload.
 
 ### Mixcloud auth
@@ -103,21 +115,9 @@ radio API (paginated)  ──generate_shows_json()──▶  shows.json  (normal
 - The token is sent as an `access_token` query parameter.
 - On HTTP 401/403 from Mixcloud, the app logs the error and clears the in-memory token (it no longer deletes `token.txt`). To renew: get a token through Mixcloud's OAuth flow (developer app at mixcloud.com/developers), then update `MIXCLOUD_TOKEN` in Railway (that redeploys the service) or `token.txt` locally.
 
-## Adapting to a new radio API (planned)
+## Changing the source API again
 
-The intended seam is the **normalized show schema**. To switch sources:
-
-1. Rewrite `get_total_pages` / `fetch_page` / `fetch_all_profiles` for the new API's URL, auth and pagination, and change `BASE_URL`.
-2. Rewrite `extract_current_profiles` to map the new fields onto `id, name, host, tags, description, picture, slug`, and to work out which shows are "current".
-3. Keep the output shape identical. Then `index.html`, `find_best_match` and `upload` need no changes.
-4. Watch the parts that hard-code Dublab assumptions outside the fetcher:
-   - The tracklist URLs (`dublab.cat/shows/{slug}/{date}` and the `b-sides` special case) in `upload()`.
-   - `host` being a single string (a new API might return a list of hosts and need joining).
-   - `tags` being a list of strings (a new API might return objects).
-   - The picture's `image/jpeg` content type.
-5. Delete `shows.json` (or call `POST /refresh_shows`) after deploying so the cache is rebuilt.
-
-When the new API definition arrives, record its endpoint, auth and field mapping under "Knowledge log" below.
+The seam is the **normalized show schema**. Rewrite the fetch functions and `normalize_profile()` / `resolve_picture_url()`, keep the output shape, and `index.html`, matching and `upload()` need no changes. Things hard-coded outside the fetcher: the tracklist URLs and the `b-sides` special case in `upload()`. After deploying, call `POST /refresh_shows` (or delete `shows.json`) so the cache is rebuilt.
 
 ## Known issues / gotchas
 
@@ -125,7 +125,8 @@ When the new API definition arrives, record its endpoint, auth and field mapping
 - `uploads/<file.filename>` uses the client-supplied filename unsanitized (path traversal possible). It also collides if two people upload the same filename at once.
 - With an empty date, `date_str_for_title` becomes `".."`, because `.strip("-")` doesn't strip dots. With an empty host, the title ends in `" w/"`.
 - `MixcloudUploader` is re-created on every upload, re-reading `shows.json` from disk each time.
-- The radio API calls have no timeout. Only `requests.HTTPError` is caught per page, not connection errors.
+- The tracklist URLs (`http://dublab.cat/shows/{slug}/{DD-MM-YY}` and `/b-sides/{host}`) are unverified against the new site. The v2 API's episode slugs look like `balsamo-03-07-26`.
+- `/refresh_shows` and the startup fetch raise if the API is down. Upload-time lookups fall back to the cache.
 - CORS is wide open (`*`), and there's no auth on any endpoint. Anyone who can reach the server can upload to the radio's Mixcloud account or trigger refreshes.
 
 ## Security notes
@@ -145,5 +146,6 @@ When the new API definition arrives, record its endpoint, auth and field mapping
 
 Append dated entries here for decisions, discoveries, credentials *locations* (never values), and API details learned while working, so they're available from any machine.
 
+- 2026-10-13: Migrated to the Dublab v2 API (list + slug + search endpoints, relative picture paths). 49 current shows. Old shows missing from v2 as current include b-sides.
 - 2026-10-13: Token moved from the committed `token.txt` to the `MIXCLOUD_TOKEN` env var (file kept as a local fallback); a 401/403 no longer deletes the file.
-- 2026-10-13: CLAUDE.md created from a full code review. Local dev uses `.venv` because Homebrew's uvicorn is isolated. 62 current shows in the Dublab API at this date.
+- 2026-10-13: CLAUDE.md created from a full code review. Local dev uses `.venv` because Homebrew's uvicorn is isolated. 62 current shows in the old Dublab API at this date.

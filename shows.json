@@ -1,0 +1,615 @@
+[
+  {
+    "id": 2071,
+    "name": "3Ocell",
+    "host": "Silvia Galí",
+    "tags": [
+      "deep listening"
+    ],
+    "description": "Buscamos ese tercer ocell que se resiste a hacer algo. Una pausa, y una llamada a la atención. Una conversación plural de voces que trabajan en las intersecciones entre arte y educación. Un archivo de prácticas para atender distinto, para desear con tiempo, para hacer hueco en lo saturado, o para saturar lo vacío. Un momento para cegarse y sumergirse en lo que cada une llama estar ahí.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/3ocell.jpg",
+    "slug": "3ocell"
+  },
+  {
+    "id": 2081,
+    "name": "Ambient ruined my life",
+    "host": "Izar invierno y Shannax",
+    "tags": [
+      "ambient",
+      "experimental",
+      "DIY"
+    ],
+    "description": "Ambient ruined my life, y la tuya, y la de tanta gente.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/e2403d80b8eea167.png",
+    "slug": "ambient-ruined-my-life"
+  },
+  {
+    "id": 171,
+    "name": "Ameba Radio",
+    "host": "Mario Fano & Héctor Pascual",
+    "tags": [
+      "Electronica",
+      "Barcelona",
+      "local"
+    ],
+    "description": "Ameba (l'associació de música electrònica de barcelona) és una associació cultural establerta a la ciutat de Barcelona que neix el desembre del 2014 com una entitat sense ànim de lucre per dur a terme diferents activitats culturals i formatives relacionades amb la música electrònica i la cultura del dj, promocionant i difonent la música electrònica creada a Catalunya en totes les seves variants artístiques. Héctor Pascual i Mario Fano dirigeixen aquest espai sonor on el teixit electrònic local format per djs, vjs, productors, promotors, sales de concerts, botigues de discos, dissenyadors, etc... són els protagonistes.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/AMEBA_Dublab.jpeg",
+    "slug": "ameba-radio"
+  },
+  {
+    "id": 2045,
+    "name": "año Bisiesto",
+    "host": "diego cuéllar",
+    "tags": [
+      "Urban",
+      "Ambient",
+      "D&B"
+    ],
+    "description": "\"año Bisiesto\" és un programa de ràdio conduït per diego cuéllar que integra una hora de música amb ritmes urbans d’arreu del món, drone music, ambient, spoken word i més. Una hora que combina ritmes foscos. Impulsat pel so i el costum d'expressar-se, et porta per un viatge de versos afilats i atmosferes denses i una mica de humor.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/5a45309108fbb64f.png",
+    "slug": "ano-bisiesto"
+  },
+  {
+    "id": 2030,
+    "name": "Aquí, con la Malísima",
+    "host": "La Malísima",
+    "tags": [
+      "experimental",
+      "club",
+      "avantgarde"
+    ],
+    "description": "Únete a la hora periódica de reflexión de Malísima y amigos sobre la actividad neurológica manifestada en ondas de audio, la mortalidad, el futuro del arte, la cultura pop, y las obsesiones por la música ambiental manifestadas en hilos de Twitter... entre otros.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/mdlnu.png",
+    "slug": "aqui-con-la-malisima"
+  },
+  {
+    "id": 109,
+    "name": "Archivos Anba Fil",
+    "host": "Doza",
+    "tags": [
+      "Latin",
+      "Folclore",
+      "world"
+    ],
+    "description": "Format radiofònic en clau de llibreria on música i so deriven cap a noves cartografies sonores.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/DOZA.jpg",
+    "slug": "archivos-anba-fil"
+  },
+  {
+    "id": 149,
+    "name": "BALSAMO",
+    "host": "El mito de la ciencia & La viya real",
+    "tags": [
+      "production",
+      "DIY",
+      "indie"
+    ],
+    "description": "BALSAMO propone visibilizar la producción y la cultura musical experimental under, creando una red de productrxs independientes sin distinciones de estilos. Con un productor invitado por programa, curaremos su música y mezclaremos las canciones de sus productorxs favoritos, seleccionadas para la ocasión. Conducido por La Viya Real y El Mito de La Ciencia.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/3849dd96ffff478e.png",
+    "slug": "balsamo"
+  },
+  {
+    "id": 42,
+    "name": "Battuta",
+    "host": "Zenjis",
+    "tags": [
+      "beats",
+      "hip hop",
+      "electronic"
+    ],
+    "description": "Impros, jams, sorolls amplificats, projectes sense acabar, performances úniques i més bogeries, des de la Bat-cova.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/zenjis.jpg",
+    "slug": "battuta"
+  },
+  {
+    "id": 169,
+    "name": "Boiling Point",
+    "host": "Nando Hervido",
+    "tags": [
+      "dub",
+      "electronic",
+      "leftfield"
+    ],
+    "description": "El punto de ebullición es aquel en que la temperatura de un líquido es tan alta que forma burbujas de vapor en su interior. Algo parecido provocan estas canciones en la sangre, y traen consigo una sensación que altera cuerpo y mente. Aunque, pensándolo bien, también podríamos estar hablando de emociones.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/cuadrada-dj-BP.jpeg",
+    "slug": "boiling-point"
+  },
+  {
+    "id": 2064,
+    "name": "Bon dia Momo",
+    "host": "Paula Ve Con Momo",
+    "tags": [
+      "morning",
+      "interviews",
+      "miscellaneous"
+    ],
+    "description": "Paula Luque aka Paula Ve Con Momo, melómana empedernida, Dj selector formada en la escuela feminista de SyncSin @sin.sync y colaboradora eventual de Dublab Barcelona @dublab.cat; la hemos escuchado en algunos de los locales más underground de la ciudad barcelonesa, con un estilo versátil basado en la electrónica IDM, el UK garage y el Techno de ciudades como Detroit y Berlín, mezclados con ritmos más suaves del house, clásicos del jazz, música latina y del mundo. Abre por fin el chiringuito radiofónico de manera más pausada, con un programa matinal los miércoles en Dublab. ¡Bienvenida Momo!",
+    "picture": "https://api.dublab.cat/media/photos/profiles/IMG-20251102-WA0100.jpg",
+    "slug": "bon-dia-momo"
+  },
+  {
+    "id": 2073,
+    "name": "Camerino Submarino",
+    "host": "Izar / Iris",
+    "tags": [
+      "varietat",
+      "bisarro"
+    ],
+    "description": "Aixo es camerino submarino no tho voldras perdre",
+    "picture": "https://v2.dublab.cat/uploads/profiles/9fa9e094ebd40621.jpg",
+    "slug": "camerino-submarino"
+  },
+  {
+    "id": 2020,
+    "name": "Cinema y Paraíso",
+    "host": "Kinética",
+    "tags": [
+      "producción",
+      "conversacion",
+      "musica"
+    ],
+    "description": "En 'Cinema y Paraíso', les invito a un viaje a través de mi pasión por el cine, la música, el diseño sonoro, la producción musical, las artes escénicas, la danza, los DJ y mucho más. Este es un espacio donde compartiré todo lo que me apasiona, explorando un mundo que siempre me ha encantado compartir.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Cinema_y_Paraiso.jpg",
+    "slug": "cinema-y-paraiso"
+  },
+  {
+    "id": 2072,
+    "name": "Clockwork Sonata",
+    "host": "toa",
+    "tags": [
+      "bass"
+    ],
+    "description": "Una sèrie de paisatges per a aterratges forçats. Parlaran la nostra llengua i aprendrem les seves cançons en perfecta harmonia. I la nostra refineria, les màquines de la qual cruixen agonitzant, entendrà la seva finalitat.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/clockwork-sonata.jpeg",
+    "slug": "clockwork-sonata"
+  },
+  {
+    "id": 2036,
+    "name": "clublab",
+    "host": "dublab BCN",
+    "tags": [
+      "club",
+      "arxiu"
+    ],
+    "description": "Clublab és la selecció definitiva per als caps de setmana reunint els programes de música de club més destacats de l'arxiu de dublabBCN. Aquí trobaràs una barreja de sons electrònics que van des del house al techno, passant per ritmes més avantguardistes. Cada programa t’ofereix l’atmosfera autèntica d’una nit de club, ideal per gaudir a qualsevol hora del cap de setmana, ja sigui per posar-te en mode festa o per deixar-te portar pels beats electrònics.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/1.clublab_december_main.jpg",
+    "slug": "clublab"
+  },
+  {
+    "id": 2070,
+    "name": "CTRL + T",
+    "host": "tabs",
+    "tags": [
+      "UK garage",
+      "house"
+    ],
+    "description": "Soy una DJ nacida en el Reino Unido y residente en Barcelona. Mezclo música electrónica variada, principalmente UKG y Garage House, aunque no de forma exclusiva, con sonidos de distintas partes del mundo. Exploro tanto joyas ocultas del pasado como nuevos lanzamientos.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/image0.jpeg",
+    "slug": "ctrlt"
+  },
+  {
+    "id": 2075,
+    "name": "D'un glop",
+    "host": "Pixie Pitis",
+    "tags": [],
+    "description": "vols prendre un glop? benvingut al nou programa de @dublab.cat hosted by pixie pitis!! d'un glop és un programa on el fil conductor és la relació sinestèsica entre música i begudes. a cada programa un dj convidat dedicarà un set a una beguda que li agradi, obviament després descobrirem les raons per que aquesta beguda és rellevant a la seva vida!",
+    "picture": null,
+    "slug": "dun-glop"
+  },
+  {
+    "id": 2078,
+    "name": "El mediocielo",
+    "host": "Esther efe ce",
+    "tags": [
+      "Ascensione",
+      "Erótica",
+      "Mística"
+    ],
+    "description": "",
+    "picture": null,
+    "slug": "el-mediocielo"
+  },
+  {
+    "id": 2034,
+    "name": "Fil Nocturn",
+    "host": "dublab BCN",
+    "tags": [
+      "ambient",
+      "nocturn"
+    ],
+    "description": "Fil Nocturn t’ofereix una selecció d'ambient dissenyada per acompanyar la nit, des de les 22h fins a les 09h. Aquesta franja t’embolcallarà amb sons atmosfèrics i subtils, creant un ambient perfecte per relaxar-se o treballar en silenci. Amb una barreja d’estils i textures, Fil Nocturn és l’espai ideal per desconnectar del ritme diari i trobar una pausa sonora que t’acompanya des del vespre fins a les primeres hores del matí.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/FilNocturn_naraisneus2_.jpg",
+    "slug": "fil-nocturn"
+  },
+  {
+    "id": 162,
+    "name": "First Floor",
+    "host": "Shawn Reynaldo",
+    "tags": [
+      "electronic",
+      "ambient",
+      "experimental"
+    ],
+    "description": "First Floor is an exploration of all things electronic music. Headed by journalist Shawn Reynaldo – who also writes the newsletter of the same name – the show highlights emerging sounds and artists making waves both on and off the dancefloor.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Shawn_Reynaldo_credit_Carys_Huws.jpeg",
+    "slug": "first-floor"
+  },
+  {
+    "id": 2058,
+    "name": "Fragment A",
+    "host": "Fragment A",
+    "tags": [
+      "electronica",
+      "label"
+    ],
+    "description": "-",
+    "picture": "https://api.dublab.cat/media/photos/profiles/fragmentacurates.jpg",
+    "slug": "fragment-a"
+  },
+  {
+    "id": 2003,
+    "name": "Fred i calor",
+    "host": "Frederik Tollund",
+    "tags": [
+      "UK",
+      "techno",
+      "diva house"
+    ],
+    "description": "Frederik Tollund and occasional guests surf the best Venn diagrams of cold electronic breaks and warm emotive textures.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/PHOTO-2024-01-10-16-02-05.jpeg",
+    "slug": "fred-i-calor"
+  },
+  {
+    "id": 180,
+    "name": "GI MUSIC",
+    "host": "Gigi",
+    "tags": [
+      "trap",
+      "hip-hop",
+      "talk show"
+    ],
+    "description": "Repàs de l'actualitat i grans clàssics del gènere creat entre Cleveland Avenue i Calle Elvira més tots els seus derivats i altres influencies. Música i talk show informal.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/G_MUSIC.png",
+    "slug": "gi-music"
+  },
+  {
+    "id": 68,
+    "name": "Good Chroma",
+    "host": "Charlotte",
+    "tags": [
+      "talk show",
+      "eclectic",
+      "pop culture"
+    ],
+    "description": "Good Chroma es un show evasivo e invasivo. Es de ayer de ahora y de mañana. Sin pretensión, sin expertivismo y con mucho amor por la música.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/97a3fcef51b8e919.jpg",
+    "slug": "good-chroma"
+  },
+  {
+    "id": 37,
+    "name": "Hedonic Reversal",
+    "host": "Andrés Satué & Miguel Sueiro",
+    "tags": [
+      "experimental",
+      "avant-garde",
+      "postindustrial"
+    ],
+    "description": "Hedonic Reversal es el programa de radio del sello discográfico creado por Miguel Sueiro (también fundador del sello Bestiarie) y Andrés Satué (músico experimental, aka Huma y ahora también Kosu Nes) para dar cabida a los sonidos electrónicos más vanguardistas y experimentales. Hedonic Reversal (sello) tiene ya más de 15 ediciones hasta la fecha han editado trabajos de artistas locales como Olor Acre, Refectori o Huma, nacionales como Death Whistle o IOM e internacionales como Orphan Swords (Bélgica), Corgiat (Italia) o Plaktilts (Japón). El programa explora tanto las últimas novedades, que abarcan desde la electrónica experimental hasta el metal e industrial, como referencias más clásicas. Estas dos perspectivas están delineadas por las personalidades y preferencias de cada presentador.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/hedonic_reversal.jpg",
+    "slug": "hedonic-reversal"
+  },
+  {
+    "id": 160,
+    "name": "Infrasò",
+    "host": "Quim Torres & Gerard Brull",
+    "tags": [
+      "Metal",
+      "Post-Metal",
+      "Doom"
+    ],
+    "description": "L'oïda humana no està preparada per a sentir infrasons, tot i que aquestes ones de so, quan són produïdes per terratrèmols o explosions volcàniques, tenen la mateixa intensitat que les produïdes per una bomba atòmica. En aquest podcast cerquem entre els sons més obscurs, pesants i recòndits per a que pugueu sentir la intensitat del Mètal i les seves variants més extremes i/o experimentals.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/logo_sobre_negre.png",
+    "slug": "infraso"
+  },
+  {
+    "id": 2033,
+    "name": "InterUnivers",
+    "host": "Museless",
+    "tags": [
+      "psychology",
+      "sound",
+      "electronic"
+    ],
+    "description": "Museless ha encontrado su espacio en la escena electrónica, participando en festivales como Primavera Sound, Sónar, SXSW y Burningman. Desde su primer EP \"Grey Boy\" (2016) hasta su primer álbum \"Dichotomic History\" (2017), el proyecto ha mostrado una evolución constante. Su segundo LP, \"Synthesis de Novo II\" (2022), explora una narrativa de ciencia ficción. Recientemente, ha lanzado un single con Samain Music que formará parte de un EP de tres temas de música folclórica y tradicional catalana, con las colaboraciones de Raquel Cruces y Mariona Segarra. Actualmente, Museless está en una fase de exploración creativa, colaborando en proyectos multidisciplinares y llevando su música hacia nuevos horizontes.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/03680005.JPG",
+    "slug": "interunivers"
+  },
+  {
+    "id": 85,
+    "name": "It’s About That",
+    "host": "John Joe",
+    "tags": [
+      "soul",
+      "groove",
+      "electronic"
+    ],
+    "description": "Selecció de música conmovedora extreta del fons personal de John Joe, acumulat durant diversos anys d'àvida col·lecció al Regne Unit. Aquesta col·lecció va quedar arxivada quan John Joe va venir cap a Barcelona i diversos anys més tard ha estat rescatada de l’humit magatzem.Dins de la selecció ens podem trobar gemmes que van del jazz al house, del northern soul al techno, del disco al reggae i de qualsevol altra cosa que pugui encaixar enmig, però millor creure que tot tindrà aquest groove.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/JJ_Dublab.jpeg",
+    "slug": "its-about-that"
+  },
+  {
+    "id": 2056,
+    "name": "La hora del te",
+    "host": "DJ Hidrataccioni",
+    "tags": [
+      "electronica"
+    ],
+    "description": "\"La hora del té\" es un espacio radiofónico hosteado por Hebe Kiebooms aka Dj Hidrataccioni, se plantea como un talkshow interactivo donde se abordaran distintos temas referentes al arte, la cultura, el club, la escena, la industria cultural y músical, así como otras ramas artísticas y quehaceres creativos. Es un espacio abierto al debraye y al desvarío etimológico espiritual así como a lo esotérico conceptual. Acompañado siempre de invitadxs de interés y de una fina selección musical.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/000047-8.jpeg",
+    "slug": "la-hora-del-te"
+  },
+  {
+    "id": 2057,
+    "name": "La rara",
+    "host": "Orieta Chrem, Vitu Valera",
+    "tags": [
+      "electronica"
+    ],
+    "description": "LA RARA és un programa de ràdio emès des de Barcelona, presentat per artistes del segell MATRACA. Presentarem els nostres llançaments més recents, DJ sets inèdits en vídeo d’artistes llatinoamericans i internacionals, així com històries i entrevistes a productores i amants del so.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/LA_RARA_LOGO_color.jpg",
+    "slug": "la-rara"
+  },
+  {
+    "id": 2080,
+    "name": "Las Otras",
+    "host": "Alicia G. Núñez y Leonardo Argüello",
+    "tags": [
+      "Ideario",
+      "WIP",
+      "Artistas"
+    ],
+    "description": "",
+    "picture": null,
+    "slug": "las-otras"
+  },
+  {
+    "id": 2065,
+    "name": "Lucii On Air",
+    "host": "Alain Gertrand",
+    "tags": [
+      "electronic",
+      "underground",
+      "berlinbarcelona"
+    ],
+    "description": "Soulful music, underground culture, passionate artists and inclusive scenes - these elements constitute Lucii's DNA, brought to you by Alain Gertrand.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/luciionair.jpg",
+    "slug": "lucii-on-air"
+  },
+  {
+    "id": 108,
+    "name": "Mild to Wild",
+    "host": "Katie Belle & Martin Allais",
+    "tags": [
+      "disco",
+      "jazz",
+      "soundtrack"
+    ],
+    "description": "Sound enthusiasts and story tellers with a self fulfilling prophecy, mild to wild",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Mildtowild.JPG",
+    "slug": "mild-to-wild"
+  },
+  {
+    "id": 72,
+    "name": "Naturoculturas son disturbios",
+    "host": "Jara Rocha",
+    "tags": [
+      "talk show",
+      "experimental",
+      "eclectic"
+    ],
+    "description": "Normalizaciones son daños, nomenclaturas son desencantos, nosotras son difracciones, novedades son delirios, narraciones son diferencia, nortes son devastanciones, números son desbandos, nubes son disenso y naturoculturas son disturbios.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Naturoculturas_son_disturbios.png",
+    "slug": "naturoculturas"
+  },
+  {
+    "id": 158,
+    "name": "Onda Ramera",
+    "host": "Mar Phonoll",
+    "tags": [
+      "sound collage",
+      "ecofeminismo",
+      "soundscape"
+    ],
+    "description": "En la edad media, para señalizar las tabernas se colgaba un ramo en la puerta. Con inteligencia y disimulo, las prostitutas empezaron a hacer lo mismo, convirtiéndose popularmente en rameras. En Onda Ramera colgamos un ramo en la puerta del estudio y sintonizamos con la ramera que llevamos dentro. Y con la tabernera. Y con la bruja. Radiaremos collages sonoros a favor de la vida interconectada y del buen vivir. Un experimento sónico y promiscuo donde confluirán las ecofeministas, la agricultura regenerativa, la biodinámica, la astrología, el tarot, el folklore y la viticultura natural.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/ONDA_RAMERA.jpg",
+    "slug": "onda-ramera"
+  },
+  {
+    "id": 144,
+    "name": "oRUIDOoPOESIAo",
+    "host": "Laura Renau & Pilar Talavera",
+    "tags": [
+      "poetry",
+      "noise",
+      "spoken word"
+    ],
+    "description": "RoP és un magazine literari feminista, composat per diferents apartats en que es barrejen l'experimentació sonora, la temàtica spoken word i les diverses pràctiques que han lligat la literatura amb la música, una mena de club de lectura radiofònic. Cada programa compta amb un apartat d'entrevistes i presentacions de novetats literàries, posant especial atenció a les noves veus de la literatura, petites editorials o edicions independents.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/RUIDOOPOESIA_VLTRA_GLITCH_1.jpg",
+    "slug": "oruidoopoesiao"
+  },
+  {
+    "id": 2029,
+    "name": "Philocore",
+    "host": "Laura Benítez Valero",
+    "tags": [
+      "philosophy",
+      "experimental",
+      "talkshow"
+    ],
+    "description": "La producción-de-sí como acontecer del ser es una mentira. Esto es una sintaxis (abierta) del hacer. Un intermedio. Una interzona. Un pathos a 220 BPM. Esto es Hardcore existencial.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/IMG_5888-1.jpg",
+    "slug": "philocore"
+  },
+  {
+    "id": 2052,
+    "name": "Playing for the City",
+    "host": "Groove Research",
+    "tags": [
+      "electronic",
+      "club",
+      "podcast"
+    ],
+    "description": "Emotional landscapes of cities. Each episode invites a guest to create a club mix moved by a place that holds personal meaning, and that inspires them too. What that place felt and sounded like - to them. Freely adapted from the mood-driven storytelling of the early 2000s 'Global Underground' and 'nite:life' series, 'Playing for the City' is both a rotating postcard and a musical memory archive. Here and there, with podcast interviews to guests you want to talk to. Hosted and curated by journalist-selector Groove Research (Federico), Keidi at the visuals, Giacomo for audio & editing.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Dublab_Playing_for_the_City_cover_large.jpg",
+    "slug": "playing-for-the-city"
+  },
+  {
+    "id": 2059,
+    "name": "Progressivee",
+    "host": "Davee",
+    "tags": [
+      "house",
+      "progressive"
+    ],
+    "description": "Progressivee is the monthly radio show hosted by Davee where he plays the best new melodic and progressive house by emerging artists. Davee is an Italian DJ/producer based in Barcelona. He loves the progressive sound and creates electronic music with delicate melodies and irresistible grooves. Since his first release in 2022, his music has received support from industry heavyweights like Sultan + Shepard, Solarstone, Super8 & Tab, and Daniel Wanrooy. He has been releasing on Monowave, Magic Island, Scorchin Progressive, and Elpida.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/progressivee.jpeg",
+    "slug": "progressivee"
+  },
+  {
+    "id": 33,
+    "name": "Radio Noche",
+    "host": "Flores del Río",
+    "tags": [
+      "talk show",
+      "pop culture",
+      "miscellaneous"
+    ],
+    "description": "Dins de la nit hi ha moltes altres nits, ho sabien els locutors nocturns que les il·luminaven amb els seus neons sònics, fascinants, obsessius. A cada programa de \"Radio Noche\" es tractaran dos temes inconnexos però que ens han assaltat compulsivament al voltant de la música, al voltant de la mitjanit.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Radio_Noche.jpg",
+    "slug": "radio-noche"
+  },
+  {
+    "id": 2016,
+    "name": "Salt Water",
+    "host": "La Rage",
+    "tags": [
+      "ambient",
+      "hip hop"
+    ],
+    "description": "This show brings together ambient and hip-hop music, crossing genres that have a lot in common. Coming from poetry and layered sounds, they often take birth in darker place to allow for recovery. Like, salt water they possess healing property.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/25620a2cd37a6c59.webp",
+    "slug": "salt-water"
+  },
+  {
+    "id": 2077,
+    "name": "S'horabaixa a la Tramuntana",
+    "host": "Catiana & Stooge",
+    "tags": [
+      "Cosmic Rock",
+      "Psych Folk",
+      "Tramuntana ss"
+    ],
+    "description": "és un viatge sonor dissenyat per acompanyar el moment més màgic del dia. Quan el sol comença a baixar i tenyeix de colors càlids els penya-segats i les oliveres de la Serra, la música es converteix en el fil conductor de la calma. Una selecció musical curada i tranquil·la, ideal per desconnectar de la rutina i connectar amb l'essència i la pau baleàrica.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/aa970a0c373bf66f.png",
+    "slug": "shorabaixa-a-la-tramuntana"
+  },
+  {
+    "id": 56,
+    "name": "Sonic Temple",
+    "host": "Roger Estrada",
+    "tags": [
+      "rock",
+      "punk",
+      "garage"
+    ],
+    "description": "Sonic Temple és una oda mensual al rock de guitarres. Cançons per injectar-nos cafeïna melòdica de bon matí o per calar-li foc a la nit eterna, per canalitzar el nostre descontentament diari o per celebrar que estem millor que mai. Amb riffs monumentals. Sempre. Un programa per a la joventut sònica de qualsevol edat.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Sonic_Temple.jpg",
+    "slug": "sonic-temple"
+  },
+  {
+    "id": 2076,
+    "name": "Soundscapes",
+    "host": "Dosha",
+    "tags": [
+      "entrevista",
+      "electronica",
+      "novetats"
+    ],
+    "description": "SOUNDSCAPES - The Art of Listening Soundscapes by Dosha es un viatge sonor on la música es converteix en experiència, emoció i paisatge. Una selecció cuidada de sons ambient, downtempo, organic, melodic, deep house, indie electronica i neo-classical, escollits per crear una narrativa musical que convida a aturar-se, escoltar i deixar-se portar. Cada programa és un paisatge diferent. Una curadoria personal construïda a través de melodies, textures, ritmes i atmosferes. Música per descobrir, per sentir i, sobretot, per escoltar. Després de molts anys explorant la música electrònica underground i compartint-la a través de la ràdio, Dosha obre amb Soundscapes una nova etapa, més íntima, emocional i contemplativa. Sense presses. Sense soroll. Només música.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/c2ccb26dc7fab1e9.png",
+    "slug": "soundscapes"
+  },
+  {
+    "id": 2055,
+    "name": "Souterrain",
+    "host": "Thérèse Ha",
+    "tags": [
+      "electronica"
+    ],
+    "description": "En su residencia en Dublab, Thérèse Ha destaca a artistas residentes en Francia. Una forma de reconectar con la casa y con una escena electrónica tan rica como diversa.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/IMG_6429.jpeg",
+    "slug": "souterrain"
+  },
+  {
+    "id": 67,
+    "name": "The Cosmic Rider",
+    "host": "Gonzo",
+    "tags": [
+      "post-punk",
+      "industrial",
+      "leftfield"
+    ],
+    "description": "Emanacions còsmiques del més enllà en forma de post-punk, industrial i la new wave menys evident amb tocs de psicodèlia, kraut, prog-rock, library, avant-garde i contemporània. En directe a dublabBCN des del 2016. Comandat per Gonzo, Fledermaus i Geni Román. Tune in!",
+    "picture": "https://api.dublab.cat/media/photos/profiles/The_Cosmic_Rider_c6E1ZLw.jpg",
+    "slug": "the-cosmic-rider"
+  },
+  {
+    "id": 187,
+    "name": "The Journey",
+    "host": "Buk'z",
+    "tags": [
+      "talk show"
+    ],
+    "description": "Life is about exploring, observing, being adventurous, perspiring nature, challenging difficulties, and finding solutions (to these same difficulties). Life, as complex as it could be, is about taking risks. That's how I embrace it. At least, up until nowadays, that's been my existential path from Freetown through Barcelona to London and so on, therefore I've decided to entitle my show The Journey. The first one will be nothing more of a presentation, a straightforward intention of displaying a panoply of music tastes. From my personal few shows, and by featuring now and then at NT's, I realized there used to be a quelling aura fuelled by whatever my purpose or intention was to select different musical textures. To a certain point, I'd like to reach the soulful core, metaphorically speaking, of the audience, to persuade them to be curious, to search and research other ways of understanding music. Let's toast for the best and move forward with the community of DUBLAB BCN.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/WhatsApp_Image_2026-02-07_at_17.33.24.jpeg",
+    "slug": "the-journey"
+  },
+  {
+    "id": 145,
+    "name": "TOPLAP",
+    "host": "QBRNTHSS & Loopier",
+    "tags": [
+      "live coding",
+      "algorithmic",
+      "electronica"
+    ],
+    "description": "TOPLAP Barcelona és un col·lectiu que practica i promou el live coding, una forma d’art escènic i tècnica de creativitat centrada en l’escriptura en temps real de codi font i l’ús de programació interactiva per la creació sonora i visual. TOPLAP és un lloc de trobada on escoltar música algorítmica, informar-se de l'actualitat de la comunitat i debatre al voltant del live coding.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/toplap2.jpg",
+    "slug": "toplap"
+  },
+  {
+    "id": 2074,
+    "name": "Universo insólito nuestro",
+    "host": "RocaTarpeya",
+    "tags": [
+      "latinoamerica",
+      "texturas",
+      "ciudad"
+    ],
+    "description": "Sonidos inspirados en el caos urbano, la arquitectura y las texturas de la vida cotidiana.",
+    "picture": "https://v2.dublab.cat/uploads/profiles/6e4531e9dc87dc33.png",
+    "slug": "universo-insolito-nuestro"
+  },
+  {
+    "id": 2060,
+    "name": "Wherever the drums take me",
+    "host": "Lowprofile",
+    "tags": [
+      "bass",
+      "house"
+    ],
+    "description": "Música per a sales de sostre baix i fum dens. De l’electrònica més etèria, a la pressió de la bass music i la llibertat del house. Música para salas de techo bajo y humo denso. De la electrónica más etérea, a la presión de la bass music y la llibertat del house. Music for low-ceiling rooms filled with dense smoke. From the most ethereal electronics, to the pressure of bass music, and the freedom of house.",
+    "picture": "https://api.dublab.cat/media/photos/profiles/Black_square.jpg",
+    "slug": "wherever-the-drums-take-me"
+  }
+]

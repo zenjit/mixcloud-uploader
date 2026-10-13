@@ -7,7 +7,6 @@ from fastapi import FastAPI, UploadFile, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 import uvicorn
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import re
 from difflib import get_close_matches
 
@@ -52,7 +51,13 @@ class MixcloudAuth:
 # -----------------------
 # Dublab API fetching
 # -----------------------
-BASE_URL = "https://api.dublab.cat/api"
+API_BASE_URL = "https://v2.dublab.cat/api/v1"
+# Profile pictures come back as relative paths. New uploads ("profiles/...") are served
+# by the v2 server; legacy ones ("photos/...") are still only served by the old server.
+PICTURE_BASE_URL = "https://v2.dublab.cat/uploads/"
+LEGACY_PICTURE_BASE_URL = "https://api.dublab.cat/media/"
+PAGE_SIZE = 100
+REQUEST_TIMEOUT = 30
 SHOWS_JSON_FILE = Path("shows.json")
 
 def clean_text(text):
@@ -60,53 +65,63 @@ def clean_text(text):
         return ""
     return re.sub(r'\s+', ' ', text).strip()
 
-def get_total_pages():
-    url = f"{BASE_URL}/profiles/?page=1"
-    resp = requests.get(url)
+def resolve_picture_url(path):
+    if not path:
+        return None
+    if path.startswith(("http://", "https://")):
+        return path
+    path = path.lstrip("/")
+    base = LEGACY_PICTURE_BASE_URL if path.startswith("photos/") else PICTURE_BASE_URL
+    return base + path
+
+def fetch_current_profiles():
+    profiles = []
+    skip = 0
+    while True:
+        resp = requests.get(
+            f"{API_BASE_URL}/profiles",
+            params={"isCurrent": "true", "skip": skip, "take": PAGE_SIZE},
+            timeout=REQUEST_TIMEOUT,
+        )
+        resp.raise_for_status()
+        page = resp.json()
+        profiles.extend(page)
+        if len(page) < PAGE_SIZE:
+            return profiles
+        skip += PAGE_SIZE
+
+def fetch_profile_by_slug(slug):
+    resp = requests.get(f"{API_BASE_URL}/profiles/slug/{slug}", timeout=REQUEST_TIMEOUT)
+    if resp.status_code == 404:
+        return None
     resp.raise_for_status()
-    data = resp.json()
-    count = data["count"]
-    per_page = len(data["results"])
-    total_pages = (count + per_page - 1) // per_page
-    return total_pages, data["results"]
+    return resp.json()
 
-def fetch_page(page):
-    url = f"{BASE_URL}/profiles/?page={page}"
-    resp = requests.get(url)
+def search_current_profile(query):
+    resp = requests.get(
+        f"{API_BASE_URL}/profiles",
+        params={"isCurrent": "true", "take": 1, "search": query},
+        timeout=REQUEST_TIMEOUT,
+    )
     resp.raise_for_status()
-    return resp.json().get("results", [])
+    results = resp.json()
+    return results[0] if results else None
 
-def fetch_all_profiles(max_workers=10):
-    total_pages, first_page_results = get_total_pages()
-    all_profiles = first_page_results
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(fetch_page, page): page for page in range(2, total_pages + 1)}
-        for future in as_completed(futures):
-            try:
-                all_profiles.extend(future.result())
-            except requests.HTTPError as e:
-                logging.warning(f"Failed to fetch page {futures[future]}: {e}")
-    return all_profiles
-
-def extract_current_profiles(profiles):
-    current_profiles = [p for p in profiles if p.get("is_current")]
-    extracted = []
-    for profile in current_profiles:
-        extracted.append({
-            "id": profile.get("id"),
-            "name": profile.get("name"),
-            "host": profile.get("host") or "",
-            "tags": profile.get("tags") or [],
-            "description": clean_text(profile.get("description")),
-            "picture": profile.get("picture"),
-            "slug": profile.get("slug") or ""
-        })
-    return extracted
+def normalize_profile(profile):
+    return {
+        "id": profile.get("id"),
+        "name": profile.get("name"),
+        "host": profile.get("host") or "",
+        "tags": profile.get("tags") or [],
+        "description": clean_text(profile.get("description")),
+        "picture": resolve_picture_url(profile.get("picture")),
+        "slug": profile.get("slug") or ""
+    }
 
 def generate_shows_json():
     logging.info("Fetching profiles from Dublab API...")
-    profiles = fetch_all_profiles()
-    current_profiles = extract_current_profiles(profiles)
+    profiles = fetch_current_profiles()
+    current_profiles = [normalize_profile(p) for p in profiles if p.get("isCurrent")]
     with open(SHOWS_JSON_FILE, "w", encoding="utf-8") as f:
         json.dump(current_profiles, f, ensure_ascii=False, indent=2)
     logging.info(f"✅ Generated shows.json with {len(current_profiles)} shows")
@@ -136,13 +151,31 @@ class MixcloudUploader:
                     return show
         return None
 
+    def lookup_show(self, title):
+        """Match the title against the cached shows, then refresh that profile from the
+        API by slug. Falls back to the API search when the cache has no match."""
+        cached = self.find_best_match(title)
+        try:
+            if cached:
+                fresh = fetch_profile_by_slug(cached["slug"]) if cached.get("slug") else None
+                return normalize_profile(fresh) if fresh else cached
+            found = search_current_profile(title)
+            if found:
+                logging.info(f"Matched '{title}' to '{found.get('name')}' via API search")
+                return normalize_profile(found)
+        except requests.RequestException as e:
+            logging.warning(f"Dublab API lookup failed for '{title}', using cached data: {e}")
+            return cached or {}
+        logging.warning(f"No show found for '{title}'")
+        return {}
+
     def upload(self, mp3_path, title=None, host=None, tags=None, description=None, date_str=None, date_str_for_title=None):
         token = self.auth.get_token()
         url = f"https://api.mixcloud.com/upload/?access_token={token}"
 
         files = {"mp3": open(mp3_path, "rb")}
 
-        show_meta = self.find_best_match(title) or {}
+        show_meta = self.lookup_show(title)
         final_host = host or show_meta.get("host", "")
         final_tags = tags or show_meta.get("tags", [])[:5]
         final_description = description or show_meta.get("description", "")
@@ -164,9 +197,12 @@ class MixcloudUploader:
 
         picture_url = show_meta.get("picture")
         if picture_url:
-            pic_resp = requests.get(picture_url, stream=True)
+            pic_resp = requests.get(picture_url, stream=True, timeout=REQUEST_TIMEOUT)
             if pic_resp.status_code == 200:
-                files["picture"] = (Path(picture_url).name, pic_resp.raw, "image/jpeg")
+                content_type = pic_resp.headers.get("Content-Type", "image/jpeg")
+                files["picture"] = (Path(picture_url).name, pic_resp.raw, content_type)
+            else:
+                logging.warning(f"Could not download picture {picture_url}: {pic_resp.status_code}")
 
         logging.info(f"Uploading '{data['name']}' with tags {final_tags} and host '{final_host}'")
 
