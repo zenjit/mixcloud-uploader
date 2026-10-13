@@ -83,9 +83,9 @@ Base `https://v2.dublab.cat/api/v1`, NestJS backend, no auth for reads. The Open
 | `GET /profiles?isCurrent=true&take=1&search=…` | `search_current_profile()` | Upload fallback when the cached difflib match fails. |
 
 - Raw profile fields: `id, name, host (str), tags (list[str]), isCurrent, slug, description, bio, picture, links, createdAt, updatedAt` (+ `_count` on lists and `shows` on the slug call). `normalize_profile()` maps them onto the schema above.
-- **Pictures are relative paths.** `resolve_picture_url()` maps them as follows:
-  - `profiles/…` → `https://v2.dublab.cat/uploads/…` (new uploads).
-  - `photos/…` → `https://api.dublab.cat/media/…` (legacy images, **still only on the old server**; most profiles in Oct 2026). If the old server is shut down, these break: find their new location and update `LEGACY_PICTURE_BASE_URL`.
+- **Pictures are relative paths.** All of them are served from `https://v2.dublab.cat/uploads/profiles/…`. `resolve_picture_url()` maps:
+  - `profiles/x.png` → `https://v2.dublab.cat/uploads/profiles/x.png` (new uploads).
+  - `photos/profiles/x.jpg` → `https://v2.dublab.cat/uploads/profiles/x.jpg` (legacy path still returned by the API; the `photos/` prefix is dropped). Example: Lucii On Air → `https://v2.dublab.cat/uploads/profiles/luciionair.jpg`.
   - An empty `picture` (`""`) becomes `null`, and the upload goes out with no cover.
 - Image types include jpeg, png and webp. The upload forwards the image server's `Content-Type`.
 - `b-sides` exists (slug `b-sides`) but has `isCurrent: false`, so it is not in `shows.json` and is not found by the search fallback. The b-sides tracklist special case therefore can't trigger right now. Left as-is on purpose for now (user decision, 2026-10-13). The API also has a separate b-sides resource (`CreateBsideDto` in the spec), which may be the proper source for b-sides.
@@ -145,6 +145,7 @@ The seam is the **normalized show schema**. Rewrite the fetch functions and `nor
 
 Append dated entries here for decisions, discoveries, credentials *locations* (never values), and API details learned while working, so they're available from any machine.
 
+- 2026-10-13: All profile photos moved to `https://v2.dublab.cat/uploads/profiles/`; the old `api.dublab.cat/media/` server is no longer used for pictures. Verified all 46 current pictures return 200.
 - 2026-10-13: Confirmed the tracklist URL `http://dublab.cat/shows/{slug}/{DD-MM-YY}` is still valid on the new site. b-sides (not current in v2) deliberately left unhandled for now.
 - 2026-10-13: Migrated to the Dublab v2 API (list + slug + search endpoints, relative picture paths). 49 current shows. Old shows missing from v2 as current include b-sides.
 - 2026-10-13: Token moved from the committed `token.txt` to the `MIXCLOUD_TOKEN` env var (file kept as a local fallback); a 401/403 no longer deletes the file.

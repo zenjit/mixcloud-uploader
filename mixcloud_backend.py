@@ -52,10 +52,9 @@ class MixcloudAuth:
 # Dublab API fetching
 # -----------------------
 API_BASE_URL = "https://v2.dublab.cat/api/v1"
-# Profile pictures come back as relative paths. New uploads ("profiles/...") are served
-# by the v2 server; legacy ones ("photos/...") are still only served by the old server.
+# Profile pictures come back as relative paths ("profiles/x.png" or legacy "photos/profiles/x.jpg"),
+# all served from PICTURE_BASE_URL + "profiles/...".
 PICTURE_BASE_URL = "https://v2.dublab.cat/uploads/"
-LEGACY_PICTURE_BASE_URL = "https://api.dublab.cat/media/"
 PAGE_SIZE = 100
 REQUEST_TIMEOUT = 30
 SHOWS_JSON_FILE = Path("shows.json")
@@ -71,8 +70,9 @@ def resolve_picture_url(path):
     if path.startswith(("http://", "https://")):
         return path
     path = path.lstrip("/")
-    base = LEGACY_PICTURE_BASE_URL if path.startswith("photos/") else PICTURE_BASE_URL
-    return base + path
+    if path.startswith("photos/"):
+        path = path[len("photos/"):]
+    return PICTURE_BASE_URL + path
 
 def fetch_current_profiles():
     profiles = []
