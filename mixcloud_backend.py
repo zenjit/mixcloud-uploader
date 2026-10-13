@@ -38,6 +38,10 @@ class MixcloudAuth:
     def get_token(self):
         if self.token:
             return self.token
+        env_token = os.getenv("MIXCLOUD_TOKEN", "").strip()
+        if env_token:
+            self.token = env_token
+            return self.token
         if os.path.exists(self.token_file):
             with open(self.token_file, "r", encoding="utf-8") as f:
                 self.token = f.read().strip()
@@ -177,11 +181,7 @@ class MixcloudUploader:
             logging.info("✅ Upload successful")
             return True
         elif resp.status_code in (401, 403):
-            logging.warning("🔑 Access token invalid — deleting token file")
-            try:
-                os.remove(self.auth.token_file)
-            except OSError as e:
-                logging.error(f"Failed to remove token file: {e}")
+            logging.error(f"🔑 Access token rejected by Mixcloud ({resp.status_code}): {resp.text} — renew MIXCLOUD_TOKEN")
             self.auth.token = None
             return False
         else:
