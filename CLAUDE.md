@@ -88,7 +88,7 @@ Base `https://v2.dublab.cat/api/v1`, NestJS backend, no auth for reads. The Open
   - `photos/…` → `https://api.dublab.cat/media/…` (legacy images, **still only on the old server**; most profiles in Oct 2026). If the old server is shut down, these break: find their new location and update `LEGACY_PICTURE_BASE_URL`.
   - An empty `picture` (`""`) becomes `null`, and the upload goes out with no cover.
 - Image types include jpeg, png and webp. The upload forwards the image server's `Content-Type`.
-- `b-sides` exists (slug `b-sides`) but has `isCurrent: false`, so it is not in `shows.json` and is not found by the search fallback. The b-sides tracklist special case therefore can't trigger right now. The API also has a separate b-sides resource (`CreateBsideDto` in the spec), which may be the proper source for b-sides.
+- `b-sides` exists (slug `b-sides`) but has `isCurrent: false`, so it is not in `shows.json` and is not found by the search fallback. The b-sides tracklist special case therefore can't trigger right now. Left as-is on purpose for now (user decision, 2026-10-13). The API also has a separate b-sides resource (`CreateBsideDto` in the spec), which may be the proper source for b-sides.
 
 ### Filename conventions (in `index.html`, file-input `change` handler)
 
@@ -125,7 +125,6 @@ The seam is the **normalized show schema**. Rewrite the fetch functions and `nor
 - `uploads/<file.filename>` uses the client-supplied filename unsanitized (path traversal possible). It also collides if two people upload the same filename at once.
 - With an empty date, `date_str_for_title` becomes `".."`, because `.strip("-")` doesn't strip dots. With an empty host, the title ends in `" w/"`.
 - `MixcloudUploader` is re-created on every upload, re-reading `shows.json` from disk each time.
-- The tracklist URLs (`http://dublab.cat/shows/{slug}/{DD-MM-YY}` and `/b-sides/{host}`) are unverified against the new site. The v2 API's episode slugs look like `balsamo-03-07-26`.
 - `/refresh_shows` and the startup fetch raise if the API is down. Upload-time lookups fall back to the cache.
 - CORS is wide open (`*`), and there's no auth on any endpoint. Anyone who can reach the server can upload to the radio's Mixcloud account or trigger refreshes.
 
@@ -146,6 +145,7 @@ The seam is the **normalized show schema**. Rewrite the fetch functions and `nor
 
 Append dated entries here for decisions, discoveries, credentials *locations* (never values), and API details learned while working, so they're available from any machine.
 
+- 2026-10-13: Confirmed the tracklist URL `http://dublab.cat/shows/{slug}/{DD-MM-YY}` is still valid on the new site. b-sides (not current in v2) deliberately left unhandled for now.
 - 2026-10-13: Migrated to the Dublab v2 API (list + slug + search endpoints, relative picture paths). 49 current shows. Old shows missing from v2 as current include b-sides.
 - 2026-10-13: Token moved from the committed `token.txt` to the `MIXCLOUD_TOKEN` env var (file kept as a local fallback); a 401/403 no longer deletes the file.
 - 2026-10-13: CLAUDE.md created from a full code review. Local dev uses `.venv` because Homebrew's uvicorn is isolated. 62 current shows in the old Dublab API at this date.
